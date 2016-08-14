@@ -1,5 +1,7 @@
 # psvcd
 
+This project has no relation to Cobra Black Fin.
+
 # Motherboard. Game cart slot schematics.
 
 There can be multiple ways to access game cart data lines on motherboard.
@@ -30,14 +32,37 @@ R3, R4, R5, R6, R7 - these are pull-up resistors for DATA and CMD lines.
 
 I have chosen first approach with desoldering game cart slot since at that point I did not know all schematics.
 You may see at pics/pic3.png that motherboard also has LED1 and place for one more led that is not soldered.
-I have soldered 1x10 2mm header to the pins because it fits the hole for game cart in PS Vita body.
+I have soldered 1x10 2mm female header to the pins because it fits the hole for game cart in PS Vita body.
 
+Finally you will have to create 1x10 2mm male -> 1x10 2.54mm male adapter.
+This will be required for further usage of any prototype board.
+This adapter can be easily made with some pin headers.
+Consider looking at pics/pic5.png to see how it should look like.
 
+# Game cart. Schematics and plugging into prototype board.
 
+I admit that this is not the best approach, so feel free to advice.
+It is not good because you have to disassemble game cart.
+The best one would be to print game cart slot on 3d printer but I do not own one.
+Unfortunately there is no easy way to desolder game cart slot from PS Vita motherboard.
+You will definitely need desoldering gun but this is not enough. 
+Back side of cart slot is made from plastic and is glued to the motherboard.
+Even if you will manage to desolder game cart slot - construction will not be stable.
 
+So I have created simple adapter that can be used with prorotype board.
+You will need:
+- Game cart
+- Memory Stick Duo adapter
+- Memory Stick Duo card slot - I desoldered one from old card reader.
+- 1x10 2.54mm pin header 
 
+Steps are the following:
+- Disassemble Memory Stick Duo adapter
+- Solder pin header to adapter
+- Disassemble game cart - these come as monolithic chip with memory and controller on board.
+- Put game chip under pin headers of adapter then close the adapter.
 
-
+Consider looking at pics/pic6.png to see how it should look like.
 
 
 
