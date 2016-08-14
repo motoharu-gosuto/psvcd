@@ -1,6 +1,18 @@
-# psvcd
+# PSVCD Introduction.
 
-This project has no relation to Cobra Black Fin.
+PSVCD stands for Playstation Vita Cartridge Dump. 
+Basically this project summarizes my half year research on the ways to do a hardware dump of PS Vita cart.
+I think I should indicate that this research has no relation to Cobra Black Fin project and team.
+
+Currently the process of dumping PS Vita carts is quite involved because you have to create custom board.
+On the other hand - this approach does not have any firmware dependency since it is not related to software hacking.
+Current version of the board is constructed from DIP elements but I think in the future I will create PCB layout and smaller board.
+
+So the good news are that carts actually can be dumped. You should be able to do it if you complete all the steps of this readme.
+At current point I do not know if any of these dumps can be played on multiple different instances of PS Vita.
+Most likely it is not possible currently. Process of writing content to PS Vita cart is also not established yet, though I think it can be done.
+Also most of the cart content is still encrypted. I do not know any ways to decrypt it now.
+Though I am sure that people who work with PSP and PS3 can do it because many files look similar to these consoles.
 
 # Motherboard. Game cart slot schematics.
 
@@ -71,44 +83,44 @@ Next step would be creating custom board that will allow to dump game card.
 But before that we will need to configure FTDI chip that serves as heart of the board.
 
 For custom board you will need FT232h chip. 
-I guess FT2232h can also be used - it just has more pins and 2 channels instead of 1.
+I guess FT2232h can also be used - it just has more pins and two channels instead of one.
 FT232h can come on a breakboard - Adafruit FT232H, FTDI UM232H etc. You can use custom board as well. 
 
 For configuring FT232h we will need FT_Prog utility that can be downloaded from FTDI web page.
 Settings for FT232h are as following:
 
-- USB Config Descriptor -> Self Powered
-  We will use self powered configuration because all parts of the board including FT232h will be
+- USB Config Descriptor -> Self Powered: Enabled.
+  We will use self powered configuration because all parts of the custom board including FT232h will be
   powered from one voltage regulator. I found out that some FT232h chips do not give 3.3 volts 
   on corresponding 3v3 pins when USB power mode is selected. We MUST use 3.3 volts or game cart can be damaged.
   
-- USB String Descriptors -> Product Desc: USB FIFO
+- USB String Descriptors -> Product Desc: USB FIFO.
   This is an identifier for the device that will be later used in C++ code. It will come in handy if you use
   other FTDI devices that are also plugged into your PC. 
   For example I also used Lattice MachXO2 FPGA for some investigations. And it has FT2232h chip on board.
 
-- Hardware Specific -> Suspend on ACBus7 Low
+- Hardware Specific -> Suspend on ACBus7 Low: Enabled.
   This setting is required if FT232h is used in self powered mode. ACBus7 line must be tied to 5V through resistor.
   It will be explained later.
 
-- Port A -> Driver -> D2XX Direct
+- Port A -> Driver -> D2XX Direct: Enabled.
   We will use fast direct drivers and not virtual com port.
 
-- Port A -> Hardware -> 245 FIFO
+- Port A -> Hardware -> 245 FIFO: Enabled.
   This setting is required when Sync FIFO mode or MPSSE mode is used.
 
 ## Troubleshooting
 
-Problem1.
+Problem 1.
 
 There can be cases when you will not be able to program FT232h chip. In most cases you will see this error:
-"Index was outside the bounds of the array"
+"Index was outside the bounds of the array".
 Unfortunately this is a bug in FTDI software that is mixed together with flaw in your breakboard.
-When you observe this error take a close look at your EEPROM. Most likely you will have 93C46 type.
+When you observe this error take a closer look at your EEPROM. Most likely you will have 93C46 type.
 It is indicated in FTDI datasheets that 93C46 can be used with FT232h but unfortunately it can not.
 
 There are 2 solutions for this problem.
-- FT_Prog is written in C#. You can disassemble it with reflector and fix a code a bit so that FT232h can be programmed even with smaller 93C46.
+- FT_Prog is written in C#. You can decompile it with Reflector and fix the code a bit so that FT232h can be programmed even with smaller 93C46.
   I have this fix so maybe I will share it in the future.
 - Desolder 93C46 EEPROM and solder 93C56 EEPROM or bigger one.
 
