@@ -64,8 +64,68 @@ Steps are the following:
 
 Consider looking at pics/pic6.png to see how it should look like.
 
+# Configuring FTDI FT232h.
 
+At this point you should be able to connect PS Vita and game cart to any prototype board.
+Next step would be creating custom board that will allow to dump game card.
+But before that we will need to configure FTDI chip that serves as heart of the board.
 
+For custom board you will need FT232h chip. 
+I guess FT2232h can also be used - it just has more pins and 2 channels instead of 1.
+FT232h can come on a breakboard - Adafruit FT232H, FTDI UM232H etc. You can use custom board as well. 
+
+For configuring FT232h we will need FT_Prog utility that can be downloaded from FTDI web page.
+Settings for FT232h are as following:
+
+- USB Config Descriptor -> Self Powered
+  We will use self powered configuration because all parts of the board including FT232h will be
+  powered from one voltage regulator. I found out that some FT232h chips do not give 3.3 volts 
+  on corresponding 3v3 pins when USB power mode is selected. We MUST use 3.3 volts or game cart can be damaged.
+  
+- USB String Descriptors -> Product Desc: USB FIFO
+  This is an identifier for the device that will be later used in C++ code. It will come in handy if you use
+  other FTDI devices that are also plugged into your PC. 
+  For example I also used Lattice MachXO2 FPGA for some investigations. And it has FT2232h chip on board.
+
+- Hardware Specific -> Suspend on ACBus7 Low
+  This setting is required if FT232h is used in self powered mode. ACBus7 line must be tied to 5V through resistor.
+  It will be explained later.
+
+- Port A -> Driver -> D2XX Direct
+  We will use fast direct drivers and not virtual com port.
+
+- Port A -> Hardware -> 245 FIFO
+  This setting is required when Sync FIFO mode or MPSSE mode is used.
+
+## Troubleshooting
+
+Problem1.
+
+There can be cases when you will not be able to program FT232h chip. In most cases you will see this error:
+"Index was outside the bounds of the array"
+Unfortunately this is a bug in FTDI software that is mixed together with flaw in your breakboard.
+When you observe this error take a close look at your EEPROM. Most likely you will have 93C46 type.
+It is indicated in FTDI datasheets that 93C46 can be used with FT232h but unfortunately it can not.
+
+There are 2 solutions for this problem.
+- FT_Prog is written in C#. You can disassemble it with reflector and fix a code a bit so that FT232h can be programmed even with smaller 93C46.
+  I have this fix so maybe I will share it in the future.
+- Desolder 93C46 EEPROM and solder 93C56 EEPROM or bigger one.
+
+Problem 2.
+
+Some FT232h chips do not give 3.3v on corresponding pins when used in USB powered mode. 
+They may give 3.6v or 3.8v etc. To fix this you have to reconfigure FT232h chip to work in self powered mode.
+This may require some hadrware changes as well.
+
+For example on my breakboard I had to desolder Zero Ohm resistor that connected USB pin and VREGIN pin.
+Then I have soldered another 39K Ohm resistor that was connected to AC7 and to USB pin.
+Please consider looking into FTDI datasheets to understand what is required for self powered configuration.
+
+It looks like that famous Adafruit breakboard also has Zero Ohm resistor.
+FTDI UM232H is more clever - you can use jumpers without desoldering anything.
+
+# Building custom prototype board
 
 
 
