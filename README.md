@@ -15,7 +15,7 @@ Also most of the cart content is still encrypted. I do not know any ways to decr
 Though I am sure that people who work with PSP and PS3 can do it because many files look similar to these consoles.
 
 Last final note. This readme should not be considered as full or complete at current point.
-I hope I will be adding more and more details on the future.
+I hope I will be adding more and more details in the future.
 
 # Previous work
 
@@ -330,4 +330,66 @@ There is some additional wiring required as well.
 - Use female pin header SV4 to connect GND line with corresponding pins of the game cart. You can use SV1 or SV2 for this.
 - Connect CLK pin of FT232h with corresponding pin of the game cart. You can use SV1 or SV2 for this.
 - From jumpers JP1-JP10 select those that you have used for CLK, CMD and DAT0 lines. Place these three jumpers to pull-up the lines.
+
+# PS Vita game cart protocol.
+
+I was kinda surprised when I figured out that standard MMC protocol is used to interface with game carts.
+Specification for this protocol can be found at JDEC web site.
+When game cart is inserted and PS Vita is turned on - cart initialization starts. 
+You may notice this by looking at flashing red led indicator.
+
+Initialization of PS Vita game cart consists of 3 steps.
+
+## PS Vita game cart initialization - Step 1.
+During this step PS Vita tries to identify standard SD card or SDIO device.
+This is of course a speculation but a possibility can exist that PS Vita can interface with SD cards or SDIO devices.
+Commands that are sent during this step are not required to initialize MMC card.
+So I do not see any other logical explanation for these commands.
+
+Initialization consists of these commands:
+- 40 00 00 00 00 95 - CMD0 - GO_IDLE_STATE
+- 48 00 00 01 AA 87 - CMD8 - SEND_IF_COND
+- 45 00 00 00 00 5B - CMD5 - IO_SEND_OP_COND
+- 77 00 00 00 00 65 - CMD55 - APP_CMD
+
+## PS Vita game cart initialization - Step 2.
+During this step PS Vita tries to initialize PS Vita game cart which is basically MMC card.
+I will give a very brief description of what is happening. I am planning to share more details on this later.
+
+Initialization consists of these commands:
+- 40 00 00 00 00 95 - CMD0 - GO_IDLE_STATE
+- 41 40 FF 80 00 0B - CMD1 - SEND_OP_COND
+- 42 00 00 00 00 4D - CMD2 - ALL_SEND_CID
+- 43 00 01 00 00 7F - CMD3 - SET_RELATIVE_ADDR
+- 49 00 01 00 00 F1 - CMD9 - SEND_CSD
+- 47 00 01 00 00 DD - CMD7 - SELECT_CARD
+- 46 03 AF 01 00 43 - CMD6 - SWITCH (ERASE_GROUP_DEF)
+- 48 00 00 00 00 C3 - CMD8 - SEND_EXT_CSD
+- 50 00 00 02 00 15 - CMD16 - SET_BLOCKLEN
+- 46 03 B9 01 00 2F - CMD6 - SWITCH (HS_TIMING)
+- 46 03 B7 01 00 2D - CMD6 - SWITCH (BUS_WIDTH 4)
+
+## PS Vita game cart initialization - Step 3.
+During this step PS Vita executes custom initialization sequence through generic command CMD56.
+This step is required for initialization. If it is not executed game cart can not be read.
+CMD56 is generic command that allows PS Vita to interface with game cart by sending and receiving data packets.
+Format of these packets is vendor specific. So basically this step is a game cart protection step which identifies only original game carts.
+
+This initialization happens at high speed and is hard to sample unless you own professional gear. I do not own one so I have tried to sample with FPGA instead.
+As far as I understand this step includes 10 pairs of request/response packets.
+Some of these packets are constant while others are not and partially change after each time you turn on PS Vita.
+This is most likely related to some encryption mechanism.
+
+If you want to completely reproduce initialization of PS Vita game cart then understanding of Step 3 is essential.
+This may be required if you want to try using SD card / MMC card / SDIO external device that contains game dump instead of original game cart.
+Basically some additional hardware will be required to simulate this CMD56 initialization step.
+
+Last final comment. I currently have the dumps of these 20 data packets but I am not going to share them in the nearest future.
+I need to understand the structure of these packets and be sure that they do not contain any personal information that can disclose the user.
+
+Initialization consists of these commands:
+- 78 00 00 00 00 25 - CMD56 (REQUEST)
+- 78 00 00 00 01 37 - CMD56 (RESPONCE)
+
+
 
