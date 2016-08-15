@@ -151,5 +151,141 @@ FTDI UM232H is more clever - you can use jumpers without desoldering anything.
 
 # Building custom prototype board.
 
+Heart of all system is a custom board that allows to interaction between PC and PS Vita game cart.
+Consider looking at schematic pics/pic7.png for further details.
+Custom board consists of multiple sections that are described below.
+
+## Voltage regulator section
+
+When powered from USB we have 5 volts. Any SD cards or MMC cards work from 3.3 volts or even lower 1.8 volts.
+Using 5 volts will damage the card. 
+Voltage regulation section is located in top left corner of schematic file.
+
+Required parts are:
+- DS1099-B USB port type B. You can use Type A if you prefer. 
+- Two leds: these are optional and are used just to show that power is on.
+- R21, R22: 220 Ohm resistors for leds.
+- LD1117V33: Voltage regulator that will transform USB 5V to 3.3V
+- C1: Filtering capacitor 100 uF.
+- C5, C6, C7: Filtering capacitors 1uF.
+- S1: Dip Switch 1 pin: this is optional. Used to switch custom board power on and off.
+- SV3, SV4: Two 1x10 2.54mm female headers. These are used to wire any other places of custom board to VCC3V3 or GND.
+
+## Data lines section
+
+This section contains multiple female headers that can be used for wiring different devices.
+There are also other components that can be used to configure each individual line.
+Section can be found in the middle left part of schematic file.
+
+Required parts are:
+- Two 2x10 2.54 male pin headers. These are used in conjunction with jumpers for each data line.
+- Two 2x10 2.54 female headers. These are used to connect any external devices (game cart, logic analyzer etc) or to do internal wiring.
+- JP1, JP2, JP3, JP4, JP5, JP6, JP7, JP8, JP9, JP10. These are jumpers that can be used to pull
+  each individual data line to VCC3V3.
+- R1, R2, R3, R4, R5, R6, R7, R8, R9, R10. These are 4.7K Ohm pull-up resistors.
+- JP11, JP12, JP13, JP14, JP15, JP16, JP17, JP18, JP19, JP20. These are jumpers that can be used
+  to pull each individual data line to GND.
+- R11, R12, R13, R14, R15, R16, R17, R18, R19, R20. These are 4.7K Oh, pull-down resistors.
+
+## Data multiplexing section
+
+This section is used to select 1 of 8 data lines and feed output to FT232h chip.
+Section can be found in the bottom left part of schematic file.
+Data transfer between game cart and PS Vita is bidirectional. 
+That means that we may use tristate buffers as well. Though buffers are optional.
+Output of multiplexer can be controlled with G (enable) signal.
+
+Required parts are:
+- 74HC244N: Octal tristate buffer.
+- 74HC151N: 8-dine to 1-dine data multiplexer.
+
+Main idea is to connect data lines D0-D7 to 74HC244N. Output of 74HC244N should be connected to 74HC151N.
+74HC151N will allow to select one of 8 data lines. Others will be tristate.
+Address lines of 74HC151N are connected to GPIO pins of FT232h.
+Enable pins of 74HC244N should be connected to GPIO pin of FT232h.
+
+This will allow to select and read 1 of 8 data lines while others will be tristate. 
+Address of line and read/write mode will be controlled by FT232h.
+
+## Data demultiplexing section
+
+This section is used to select 1 of 8 lines and use it as output to game cart.
+Section can be found in the bottom right part of schematic file.
+
+Required parts are:
+- Two 74HC125N: Quadruple bus buffer gates with tristate outputs.
+- 74HCT138N: 3 to 8 line decoder, inverting
+
+Main idea is to connect data lines D0-D7 to output pins of 74HC125N tristate buffers.
+Outputs of 74HCT138N decoder should be connected to enable pins of 74HC125N.
+Input pins of 74HC125N should all be connected together to GPIO pin of FT232h
+Address lines of 74HCT138N decoder should be connected to GPIO pins of FT232h.
+Enable pin of 74HCT138N should be connected to GPIO pin of FT232h.
+
+This will allow to select and write to 1 of 8 data lines while others will be tristate. 
+Address of line and read/write mode will be controlled by FT232h.
+
+## Game cart initialisation bypass section
+
+PS Vita game cart requires special initialization sequence before game cart can be read.
+This sequence can not be reproduced at current point. Though it is already partially known.
+To bypass this initialization a simple trick can be used:
+- Allow real PS Vita to initialize game cart. 
+- Then connect custom board. 
+- Then disconnect PS Vita.
+- Now you can read game cart.
+
+Make sure that during these steps game cart is always powered.
+
+Required parts are:
+- SV5, SV6, SV7: Three 1x10 2.54mm female headers.
+- S2, S3: Two 1x10 Dip switches.
+
+Main idea is to connect PS Vita data lines to SV6 and custom board data lines to SV5.
+On the other hand game cart will be connected to SV7.
+
+## Custom board core section
+
+Core of the custom board is FT232h chip.
+There are some other components required so that Ft232h runs as expected.
+
+Required parts are:
+- R23, R24, R25, R27, R28, R29, R30, R31, R32: 4.7K Ohm pull-up/pull-down resistors.
+- Four 1x2 2.54mm male pin headers. 
+- JP21, JP22, JP23, JP24: jumpers for selecting pull-down or pull-up configuration.
+- R26: 39K Ohm pull-up resistor.
+
+Main idea is to connect address lines of 74HC151N to GPIOH pins AC0-AC2 of FT232h.
+Address lines of 74HCT138N decoder should be connected to GPIOH pines AC3-AC5 of FT232h.
+GPIOH pin AC6 serves as read/write mode pin and should be connected to 74HC244N buffer and 74HCT138N decoder.
+Single pin can be used because 74HC244N and 74HCT138N use different levels of enable signal.
+74HCT138N uses high and 74HC244N uses low.
+All address lines and R/W line can be pulled together either to GND or to VCC by using jumpers JP23 or JP24. 
+Due to properties of my prototype board I was not able to solder separate jumper for each line. But you can do it.
+
+GPIOH AC7 line should be connected to USB 5V pin of FT232h through 39K Ohm pull-up resistor.
+GPIOH AC8, AC9 pins can not be used in MPSSE mode of FT232h so they are not connected.
+MPSSE mode will be explained later.
+VREGIN pin of FT232h should be connected to 3.3 volt output of voltage regulator.
+
+3V3, VCCIO pins should be connected to 3.3 volt and two GND pins should be connected to ground.
+
+GPIOL AD0 pin will serve as CLK in MPSSE mode.
+GPIOL AD2 pin will serve as DIN in MPSSE mode so it is connected to 74HC151N output.
+GPIOL AD5 pin will serve as DWAIT in MPSSE mode so it is connected to 74HC151N output also.
+GPIOL AD1 pin will serve as DOUT in MPSSE mode so it is connected to input of 74HC125N buffers.
+GPIOL AD3 pin can only serve as CS in MPSSE mode so it is not used and not connected.
+GPIOL AD4, AD6, AD7 pins are not used so they are not connected.
+
+DOUT, DIN/DWAIT lines can be pulled together either to GND or to VCC by using jumpers JP21 or JP22.
+
+
+
+
+
+
+
+
+
 
 
