@@ -14,6 +14,18 @@ Most likely it is not possible currently. Process of writing content to PS Vita 
 Also most of the cart content is still encrypted. I do not know any ways to decrypt it now.
 Though I am sure that people who work with PSP and PS3 can do it because many files look similar to these consoles.
 
+Last final note. This readme should not be considered as full or complete at current point.
+I hope I will be adding more and more details on the future.
+
+# Previous work
+
+I know that some research was done before me. Unfortunately clear results were not published. 
+Previous works include:
+- Dump of "Monster Hunter" and "Wipe Out" made my Katsu
+- Cobra Black Fin dongle created by corresponding team
+
+There were also some software dumps made by Mr.Gas and game modding/decryption made by Major_Tom.
+
 # Motherboard. Game cart slot schematics.
 
 There can be multiple ways to access game cart data lines on motherboard.
@@ -109,7 +121,7 @@ Settings for FT232h are as following:
 - Port A -> Hardware -> 245 FIFO: Enabled.
   This setting is required when Sync FIFO mode or MPSSE mode is used.
 
-## Troubleshooting
+## Troubleshooting.
 
 Problem 1.
 
@@ -137,7 +149,7 @@ Please consider looking into FTDI datasheets to understand what is required for 
 It looks like that famous Adafruit breakboard also has Zero Ohm resistor.
 FTDI UM232H is more clever - you can use jumpers without desoldering anything.
 
-# Building custom prototype board
+# Building custom prototype board.
 
 
 
