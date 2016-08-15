@@ -420,8 +420,27 @@ Last comment. I was also able to sample write sequences so probably it is possib
 Writing sequence includes:
 - CMD24, CMD13 - write single sector, check cart status.
 
+# PS Vita game cart filesystem.
 
+Surprisingly game cart filesystem is EXFAT. There are no official specifications published but some documentation on this filesystem can be found on net.
+Filesystem is not complicated and can be parsed without any issues. I have created corresponding parser tool that takes raw cart dump as input and
+produces directory structure with all the files from the cart in specified location.
 
+There is one exception that I should mention. EXFAT filesystem is not located at sector zero.
+Instead at sector zero you will find some SCEI specific structure that points to EXFAT VBR record.
+
+# Directory structure.
+
+The cart that I was trying to dump was "SAO - Hollow Fragment".
+Directory structure looks as following:
+
+# File encryption/compression.
+
+Most of the files are encrypted/compressed - I am not sure which.
+So most likely this dump can not be easily used on different PS Vita instances.
+I only obtained valid dump recently and did not have time yet to explore the files.
+I am quite sure that encryption scheme should be quite identical to ps3.
+So most likely people that are experienced in that area will be able to figure out the details much quicker.
 
 
 
