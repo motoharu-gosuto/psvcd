@@ -391,5 +391,41 @@ Initialization consists of these commands:
 - 78 00 00 00 00 25 - CMD56 (REQUEST)
 - 78 00 00 00 01 37 - CMD56 (RESPONCE)
 
+# Reading PS Vita game cart.
+
+Consider looking at pics/pic7.png for details.
+
+So it looks like game carts have protection and there is no way to deal with it.
+Lucky for us very old trick can be used to bypass this protection. Steps are the following:
+- Connect PS Vita and game cart - use SV2 DIP switch.
+- Turn on PS Vita and let it initialize the cart.
+- Connect custom board. Make sure that custom board also supplies power to the cart - use SV3 DIP switch.
+- Disconnect PS Vita - use SV2 DIP switch. Make sure that at this point PS Vita did not go to sleep mode and screen is still turned on. 
+  When PS Vita goes to sleep mode it sends deinitialization sequence to the game cart.
+  
+At this point game cart is initialized but we need to send couple more commands before we can read the data.
+First command is CMD6 [46 03 B9 00 00 39] - this switches game cart to low speed mode. Technically you should get a response for this command.
+But custom board is not able to handle high speeds so basically this response will contain garbage.
+Second command is CMD6 [46 03 B7 00 00 3B] - this switches game cart to 1-bit width data mode from 4-bit width data mode that is used by PS Vita.
+This command should give valid response since we are now in low speed mode.
+
+At this point you should be able to read PS Vita game cart.
+Basic commands that can be used include:
+- CMD17, CMD13 - reads single sector, check cart status.
+- CMD23, CMD18, CMD13 - set number of sectors, read multiple sectors, check cart status.
+
+These are exact sequences that are used by PS Vita to read game carts.
+
+Last comment. I was also able to sample write sequences so probably it is possible to write to game carts.
+Writing sequence includes:
+- CMD24, CMD13 - write single sector, check cart status.
+
+
+
+
+
+
+
+
 
 
