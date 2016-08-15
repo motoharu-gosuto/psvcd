@@ -313,13 +313,21 @@ GPIOL AD4, AD6, AD7 pins are not used so they are not connected.
 
 DOUT, DIN/DWAIT lines can be pulled together either to GND or to VCC by using jumpers JP21 or JP22.
 
+# Interconnections. Connecting PS Vita, game cart and custom board.
 
+Most of the custom board connections are soldered. But I tried to keep custom board as much generic as I could.
+So I left out some interconnections that should be connected with dupont wires. This allows more flexible configuration.
 
+Consider looking at pics/pic7.png for further details.
 
+There are two possible ways to connect:
+- Connect game cart directly to female pin header SV1 or SV2. This approach can be used only if CMD56 sequence is known (explained later).
+- Connect game cart to female pin header SV7. Then connect PS Vita to female pin header SV6 so that it can be enabled/disabled by using DIP switch S2.
+  Finally connect female pin header SV5 with female pin header SV1 or SV2 so that all functionality of custom board can be enabled/disabled by using DIP switch S3.
 
-
-
-
-
-
+There is some additional wiring required as well.
+- Use female pin header SV3 to connect VCC line with corresponding pin of the game cart. You can use SV1 or SV2 for this.
+- Use female pin header SV4 to connect GND line with corresponding pins of the game cart. You can use SV1 or SV2 for this.
+- Connect CLK pin of FT232h with corresponding pin of the game cart. You can use SV1 or SV2 for this.
+- From jumpers JP1-JP10 select those that you have used for CLK, CMD and DAT0 lines. Place these three jumpers to pull-up the lines.
 
