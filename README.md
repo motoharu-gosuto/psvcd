@@ -88,6 +88,38 @@ Steps are the following:
 
 Consider looking at pics/pic6.png to see how it should look like.
 
+# PS Vita game cart pinout.
+
+Game carts turned out to be simple MMC cards. Pinout is of course a bit different but it still complies with MMC card specification.
+Consider looking at pics/pic.png for details.
+Game cart has 10 pins which go in the following order:
+VCC - 3.3 volt supply
+GND - ground pin
+CLK - clock pin
+DAT3 - data line 3
+DAT2 - data line 2
+DAT1 - data line 1
+DAT0 - data line 0
+INS - insertion detect pin
+CMD - command pin
+GND - ground pin
+
+INS pin must be tied to ground which means that game cart is inserted.
+PS Vita uses all 4 DAT lines to transfer data from the cart and also to the cart.
+CMD line is used for transferring commands and reading response from the cart.
+CLK line would have frequency around 400 Mhz during initialization.
+When initialization is finished and reading starts, PS Vita switches to 4-bit width high speed mode.
+Not sure though if it is 26 or 52 Mhz but in any case this is very fast signal that is not easy to sample
+unless you have professional level gear. Typical logic analyzer will not help here.
+
+Unfortunately FT232h can handle only one input and one output line at a time in MPSSE mode.
+Luckily for us game carts support both 1-bit and 4-bit data width modes. 
+So by using couple of multiplexers and demultiplexers we can interface with the cart.
+Technically FT232h chip is capable of transferring data at max 30 Mhz in MPSSE mode.
+I was not able to get to such a high speed. I probably lack some knowledge but the other issue is that
+we need properly routed PCB for high speeds instead of DIP prototype board. So high speeds are not expected to work at the moment.
+Again luckily for us game carts can be accessed on low speeds for reading as well.
+
 # Configuring FTDI FT232h.
 
 At this point you should be able to connect PS Vita and game cart to any prototype board.
@@ -97,6 +129,8 @@ But before that we will need to configure FTDI chip that serves as heart of the 
 For custom board you will need FT232h chip. 
 I guess FT2232h can also be used - it just has more pins and two channels instead of one.
 FT232h can come on a breakboard - Adafruit FT232H, FTDI UM232H etc. You can use custom board as well. 
+
+Before configuring FT232h chip you have to install D2XX direct drivers. They can be found on FTDI web page.
 
 For configuring FT232h we will need FT_Prog utility that can be downloaded from FTDI web page.
 Settings for FT232h are as following:
