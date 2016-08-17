@@ -17,7 +17,7 @@ Though I am sure that people who work with PSP and PS3 can do it because many fi
 Last final note. This readme should not be considered as full or complete at current point.
 I hope I will be adding more and more details in the future.
 
-# Previous work
+# Previous work.
 
 I know that some research was done before me. Unfortunately clear results were not published. 
 Previous works include:
@@ -189,7 +189,7 @@ Heart of all system is a custom board that allows to interaction between PC and 
 Consider looking at schematic pics/pic7.png for further details.
 Custom board consists of multiple sections that are described below.
 
-## Voltage regulator section
+## Voltage regulator section.
 
 When powered from USB we have 5 volts. Any SD cards or MMC cards work from 3.3 volts or even lower 1.8 volts.
 Using 5 volts will damage the card. 
@@ -205,7 +205,7 @@ Required parts are:
 - S1: Dip Switch 1 pin: this is optional. Used to switch custom board power on and off.
 - SV3, SV4: Two 1x10 2.54mm female headers. These are used to wire any other places of custom board to VCC3V3 or GND.
 
-## Data lines section
+## Data lines section.
 
 This section contains multiple female headers that can be used for wiring different devices.
 There are also other components that can be used to configure each individual line.
@@ -221,7 +221,7 @@ Required parts are:
   to pull each individual data line to GND.
 - R11, R12, R13, R14, R15, R16, R17, R18, R19, R20. These are 4.7K Oh, pull-down resistors.
 
-## Data multiplexing section
+## Data multiplexing section.
 
 This section is used to select 1 of 8 data lines and feed output to FT232h chip.
 Section can be found in the bottom left part of schematic file.
@@ -241,7 +241,7 @@ Enable pins of 74HC244N should be connected to GPIO pin of FT232h.
 This will allow to select and read 1 of 8 data lines while others will be tristate. 
 Address of line and read/write mode will be controlled by FT232h.
 
-## Data demultiplexing section
+## Data demultiplexing section.
 
 This section is used to select 1 of 8 lines and use it as output to game cart.
 Section can be found in the bottom right part of schematic file.
@@ -259,7 +259,7 @@ Enable pin of 74HCT138N should be connected to GPIO pin of FT232h.
 This will allow to select and write to 1 of 8 data lines while others will be tristate. 
 Address of line and read/write mode will be controlled by FT232h.
 
-## Game cart initialisation bypass section
+## Game cart initialisation bypass section.
 
 PS Vita game cart requires special initialization sequence before game cart can be read.
 This sequence can not be reproduced at current point. Though it is already partially known.
@@ -278,7 +278,7 @@ Required parts are:
 Main idea is to connect PS Vita data lines to SV6 and custom board data lines to SV5.
 On the other hand game cart will be connected to SV7.
 
-## Custom board core section
+## Custom board core section.
 
 Core of the custom board is FT232h chip.
 There are some other components required so that Ft232h runs as expected.
@@ -442,7 +442,7 @@ I only obtained valid dump recently and did not have time yet to explore the fil
 I am quite sure that encryption scheme should be quite identical to ps3.
 So most likely people that are experienced in that area will be able to figure out the details much quicker.
 
-# Building the project
+# Building the project.
 
 ## Installing D2XX direct drivers.
 
@@ -458,7 +458,7 @@ These two variables will be used by cmake later.
 
 Also do not forget to add path to FTDI dlls to your PATH variable
 
-## Installing or Compiling BOOST
+## Installing or Compiling BOOST.
 
 This is optional and not required for dump utility. However this is required for exfat parser utility.
 I am not sure if I should quit using boost since it is not very easy to compile and may be considered big dependency to drag.
@@ -472,33 +472,33 @@ After you have your installation - create two environment variables:
 
 These two variables will be used by cmake later.
 
-## Installing cmake
+## Installing cmake.
 
 Cmake is very useful crossplatform tool for generating makefiles/solutions etc.
 You can obtain installation from their web page.
 
-## Generating solution
+## Generating solution.
 
 All you need is to navigate to src folder and execute generate.bat
 It will invoke cmake and generate MSVC 12 solution.
 If you want to use different version of MSVC - just change generator name that is specified in the bat.
 You can check generator names by calling cmake help.
 
-## Compiling
+## Compiling.
 
 Basically at this point you should be able to compile the project. 
 Let me know if there are any issues.
 
-# Brief description of tools and libraries
+# Brief description of tools and libraries.
 
-There are three tools in total:
+There are three executables and one library in total:
 - common : this library contains basic functionality that is required to initialize FTDI chip. 
-           It also contains low level stuff that uses driver API to talk with the chip.
+           It also contains low level stuff that uses driver API to talk directly to the chip.
 - sd_card : this one is currently a prototype for experimenting with something different than MMC cards. Not important.
 - mmc_card : this one can do several things with PS Vita game cart including:
--- standalone initialization : this is currently a prototype because I need to figure out what to do with CMD56.
--- entering dumpable state : this executes sequence of commands that prepare PS Vita game cart for dumping using FTDI chip and custom board.
--- dump PS Vita game cart : this basically starts dumping PS Vita game cart to binary file. 
+ * standalone initialization : this is currently a prototype because I need to figure out what to do with CMD56.
+ * entering dumpable state : this executes sequence of commands that prepare PS Vita game cart for dumping using FTDI chip and custom board.
+ * dump PS Vita game cart : this basically starts dumping PS Vita game cart to binary file. 
    This is a long process and it can be interupted by transmission errors. However you can continue dump after failure by specifying different cluster address.
    Different destination file can also be specified if you wish to manually merge parts of the dump. For example in WinHex.
 - dump_exfat: this one basically takes raw dump of PS Vita game cart and extracts all the directory hierarchy and the files to specified location.
