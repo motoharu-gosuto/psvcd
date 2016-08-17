@@ -442,9 +442,63 @@ I only obtained valid dump recently and did not have time yet to explore the fil
 I am quite sure that encryption scheme should be quite identical to ps3.
 So most likely people that are experienced in that area will be able to figure out the details much quicker.
 
+# Building the project
 
+## Installing D2XX direct drivers.
 
+Unfortunately current implementation is only for Windows platform.
+This restriction is based on FTDI drivers that are for Windows.
+I think they also have some drivers for Linux as well so I am going to figure this out in the future.
 
+After drivers are installed - create two environment variables:
+- FTDI_INCLUDEDIR : this should point to the folder where ftd2xx.h is located
+- FTDI_LIBRARYDIR : this should point to the folder where ftd2xx.lib is located
 
+These two variables will be used by cmake later.
 
+Also do not forget to add path to FTDI dlls to your PATH variable
 
+## Installing or Compiling BOOST
+
+This is optional and not required for dump utility. However this is required for exfat parser utility.
+I am not sure if I should quit using boost since it is not very easy to compile and may be considered big dependency to drag.
+But it has many useful things in it which I am used to.
+
+You may either install prebuilt binaries or compile by yourself. There are lots of guides for this.
+If you are going to compile from source then make sure you compile static multithreaded version of boost.
+After you have your installation - create two environment variables:
+- BOOST_INCLUDEDIR : this obviously should point to the directory where "boost" directory with all the includes is located.
+- BOOST_LIBRARYDIR : this variable should point to the directory with boost static libraries.
+
+These two variables will be used by cmake later.
+
+## Installing cmake
+
+Cmake is very useful crossplatform tool for generating makefiles/solutions etc.
+You can obtain installation from their web page.
+
+## Generating solution
+
+All you need is to navigate to src folder and execute generate.bat
+It will invoke cmake and generate MSVC 12 solution.
+If you want to use different version of MSVC - just change generator name that is specified in the bat.
+You can check generator names by calling cmake help.
+
+## Compiling
+
+Basically at this point you should be able to compile the project. 
+Let me know if there are any issues.
+
+# Brief description of tools and libraries
+
+There are three tools in total:
+- common : this library contains basic functionality that is required to initialize FTDI chip. 
+           It also contains low level stuff that uses driver API to talk with the chip.
+- sd_card : this one is currently a prototype for experimenting with something different than MMC cards. Not important.
+- mmc_card : this one can do several things with PS Vita game cart including:
+-- standalone initialization : this is currently a prototype because I need to figure out what to do with CMD56.
+-- entering dumpable state : this executes sequence of commands that prepare PS Vita game cart for dumping using FTDI chip and custom board.
+-- dump PS Vita game cart : this basically starts dumping PS Vita game cart to binary file. 
+   This is a long process and it can be interupted by transmission errors. However you can continue dump after failure by specifying different cluster address.
+   Different destination file can also be specified if you wish to manually merge parts of the dump. For example in WinHex.
+- dump_exfat: this one basically takes raw dump of PS Vita game cart and extracts all the directory hierarchy and the files to specified location.
