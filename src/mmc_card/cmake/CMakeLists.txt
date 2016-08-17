@@ -9,8 +9,7 @@ set(SOURCES ${SOURCE_PATH}/CMD56Initialization.h
             ${SOURCE_PATH}/CMD56Initialization.cpp
             ${SOURCE_PATH}/CMD56Packets.h
             ${SOURCE_PATH}/CMD56Packets.cpp
-            ${SOURCE_PATH}/main_mmc_dump.cpp
-            ${SOURCE_PATH}/main_mmc_init.cpp
+            ${SOURCE_PATH}/main.cpp
             ${SOURCE_PATH}/MMCCommands.h
             ${SOURCE_PATH}/MMCCommands.cpp
             ${SOURCE_PATH}/MMCDump.h

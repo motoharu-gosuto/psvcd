@@ -78,7 +78,7 @@ int enter_dumpable_mode()
 {
    FT_HANDLE ftHandle;
 
-   if(!OpenDevice1(ftHandle))
+   if(!OpenDevice(ftHandle))
       return -1;
 
    if(!psvcd::EnterDumpableMode(ftHandle))
