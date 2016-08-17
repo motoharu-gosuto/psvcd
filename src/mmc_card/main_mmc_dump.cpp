@@ -17,10 +17,11 @@
 
 #include "MMCCommands.h"
 #include "MMCDump.h"
+#include "MMCInitialization.h"
 
 #define FTDI_DEVICE_STRING_ID "USB FIFO"
 
-bool OpenDevice1(FT_HANDLE& ftHandle)
+bool OpenDevice(FT_HANDLE& ftHandle)
 {
    int index = psvcd::GetDeviceIndex(FTDI_DEVICE_STRING_ID);
 
@@ -40,6 +41,22 @@ bool OpenDevice1(FT_HANDLE& ftHandle)
       return false;
 
    return true;
+}
+
+int standalone_initialize_card()
+{
+   FT_HANDLE ftHandle;
+
+   if(!OpenDevice(ftHandle))
+      return -1;
+
+   //try to initialize mmc card
+   psvcd::InitializeMMCCard(ftHandle);
+
+   if(!psvcd::CloseDevice(ftHandle))
+      return -1;
+
+   return 0;
 }
 
 void print_date_time()
@@ -91,8 +108,10 @@ int dump_mmc_card(std::string filePath,  uint32_t initialClusterArg)
       //try to open device multiple times
       while(!openResult)
       {
-         std::this_thread::sleep_for(std::chrono::milliseconds(2000));
-         openResult = OpenDevice1(ftHandle);
+         openResult = OpenDevice(ftHandle);
+
+         if(!openResult)
+            std::this_thread::sleep_for(std::chrono::milliseconds(2000));
       }
 
       bool res = psvcd::RawBlockDumpMMCCard(ftHandle, initialCluster, failedCluster, filePath, lowFreqRequired);
@@ -172,6 +191,7 @@ int main(int argc, char* argv[])
       return -1;
    }
    
+   //TODO: this can be done much easier and informative with boost
    bool enterDumpableMode = parseBool(argv[1]);
    std::string filePath(argv[2]);
    uint32_t initialCluster = parseUint32Hex(argv[3]);

@@ -336,7 +336,7 @@ bool DumpByCluster(FT_HANDLE ftHandle, const FsSonyRoot& fsRoot, const VBR& vbr,
 
 //when card is first hardwired to custom board we have to exit from high speed mode and change bus width from 4 to one
 //since custom board does not support too high frequences and 4 bit bus width
-bool EnterDumpableMode(FT_HANDLE ftHandle)
+bool EnterDumpableModeInternal(FT_HANDLE ftHandle)
 {
    //first - switch to low speed mode
    std::this_thread::sleep_for(std::chrono::milliseconds(40));
@@ -367,7 +367,7 @@ bool psvcd::EnterDumpableMode(FT_HANDLE ftHandle)
    if(!psvcd::ConfigureDivisor(ftHandle, dwClockDivisor))
       return false;
 
-   if(!EnterDumpableMode(ftHandle))
+   if(!EnterDumpableModeInternal(ftHandle))
       return false;
 
    return true;
