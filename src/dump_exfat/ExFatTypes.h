@@ -22,7 +22,7 @@ struct FsSonyRoot
    uint64_t Unk6;
    uint32_t FsOffset;
    uint32_t VolumeLength;
-   uint8_t BytesPerSectorShift; //not sure about this one
+   uint8_t BytesPerSectorShift; //not sure about this one TODO: not confirmed
    uint8_t unk70;
    uint8_t unk71;
    uint8_t unk72;

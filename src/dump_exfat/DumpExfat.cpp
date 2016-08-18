@@ -45,6 +45,8 @@ signed int NameOffset;
 uint32_t  CurrentClus; //Cluster Being Processed
 uint32_t  NextCluster; //for computing the next cluster in a chain
 
+//TODO: console output in this utility is totally messed up
+
 bool ReadSector(std::ifstream& dumpStream, const psvcd::VBR& vbr, uint32_t sectorAddress, std::vector<uint8_t>& resp_data)
 {
    int32_t BperS = (int32_t)pow(2, vbr.BytesPerSectorShift);
@@ -95,6 +97,10 @@ bool DumpFAT(std::ifstream& dumpStream, const psvcd::VBR& vbr, uint32_t fat_addr
 
 //This function will look at all FAT entries and count cell variations
 
+//TODO:
+//I do not understand this - FAT table is actually empty (except for special required entries)
+//I think FAT table is not used in EXFAT. Should used Bitmap Allocation table instead.
+
 void FatWalk(std::ifstream& dumpStream, const psvcd::FsSonyRoot& fsRoot, const psvcd::VBR& vbr)
 {
    uint32_t CntFF = 0; //Count End Of Chains
@@ -141,6 +147,10 @@ void FatWalk(std::ifstream& dumpStream, const psvcd::FsSonyRoot& fsRoot, const p
 
 //This function will walk the FAT chain and print the clusters in order
 
+//TODO:
+//I do not understand this - FAT table is actually empty (except for special required entries)
+//I think FAT table is not used in EXFAT. Should used Bitmap Allocation table instead.
+
 uint32_t WalkFatChain(std::ifstream& dumpStream, uint32_t FirstCluster, const psvcd::FsSonyRoot& fsRoot, const psvcd::VBR& vbr)
 {
     uint32_t FatCellAddr; //For current Cell Address
@@ -167,6 +177,7 @@ uint32_t WalkFatChain(std::ifstream& dumpStream, uint32_t FirstCluster, const ps
        if (FatCellData == 0) 
          return(ChainSize); //if we hit a zero, nothing to do
 
+       //TODO: I do not understand this chaining yet. Probably had messed up the code so throwing an exception
        throw std::runtime_error("not implemented");
 
        std::cout << "   Address of Cell: " << FatCellAddr << " Hex Contents of Cell: " << FatCellData << "X Dec Contents of Cell: " << FatCellData << std::endl;
@@ -275,15 +286,20 @@ void DumpBitMap(std::ifstream& dumpStream, const psvcd::VBR& vbr)
 
 void dump_other(std::ifstream& dumpStream, const psvcd::FsSonyRoot& fsRoot, const psvcd::VBR& vbr)
 {
-    //cout << "Dumping Bit Allocation Map" << endl;
-    //DumpBitMap(ftHandle, VBR);
+   /*
+    cout << "Dumping Bit Allocation Map" << endl;
+    DumpBitMap(ftHandle, VBR);
 
-    //cout << "Analyzing 1st FAT" << endl;
-    //FatWalk(ftHandle, fsRoot, vbr);
+    cout << "Analyzing 1st FAT" << endl;
+    FatWalk(ftHandle, fsRoot, vbr);
+    */
 
-    //lseek(FD, 0, SEEK_SET);
-    //read(FD, &MainVBR, 6144);
-    //cout << "VBR Checksum Calculation " << VBRChecksum(&MainVBR[0], 5632) << endl;
+    //TODO: old code that still has to be ported
+    /*
+    lseek(FD, 0, SEEK_SET);
+    read(FD, &MainVBR, 6144);
+    cout << "VBR Checksum Calculation " << VBRChecksum(&MainVBR[0], 5632) << endl;
+    */
 }
 
 uint32_t get_sectorAddress(const psvcd::FsSonyRoot& fsRoot, const psvcd::VBR& vbr, uint32_t cluster)
@@ -383,17 +399,16 @@ void parse_up_case_table_record(std::ifstream& dumpStream, int32_t& sectorOffset
    if (!BitMap(ucte.FirstCluster)) 
        std::cout << "Cluster " << ucte.FirstCluster << " is Not Allocated" << std::endl;
 
-   /*
    for(int32_t i = 0; i < SperC; i++)
    {
-      std::vector<BYTE> resp_data;
-      CMD17_Retry(ftHandle, UPCaseTableSectorLoc, resp_data);
+      std::vector<uint8_t> resp_data;
+      ReadSector(dumpStream, vbr, UPCaseTableSectorLoc, resp_data);
 
       UpCaseTableDataSectors.push_back(resp_data);
       UPCaseTableSectorLoc++;
    }
-   */
 
+   //TODO: old code that still has to be ported
    /*
    cout << "Up-Case Table Checksum Calculation " << UPCaseChecksum(&UPCaseTable[0], UpCaseTableEntry.DataLength) << endl;
    */
@@ -408,6 +423,7 @@ void parse_directory_entry_record(int32_t& sectorOffset, const uint8_t* rootLocD
    memcpy(&de, start, sizeof(psvcd::DirectoryEntry));
    sectorOffset = sectorOffset + sizeof(psvcd::DirectoryEntry);
 
+   //TODO: old code that still has to be ported
    //uint16_t   CalcChecksum; //returned checksum
 
    long   TS_Year;
@@ -430,6 +446,7 @@ void parse_directory_entry_record(int32_t& sectorOffset, const uint8_t* rootLocD
    DirInProgress = false; //Not a Directory vs. a File
    FileInProgress = false;
    
+   //TODO: old code that still has to be ported
    /*
    lseek (FD, RootLoc, SEEK_SET); //re-seek to start of 85 entry
    ReadCnt = read(FD, &DirEntrySet, 608);
@@ -618,13 +635,11 @@ void parse_directory_entry_stream_ex_record(std::ifstream& dumpStream, int32_t& 
    {
       std::cout << "Stream Extension First Cluster " << sede.FirstCluster << " Sector Location: " << FileSectorLoc << std::endl;
 
-      /*
       if (BitMap(sede.FirstCluster)) 
-         cout << "Cluster " << sede.FirstCluster << " is Allocated" << endl;
+         std::cout << "Cluster " << sede.FirstCluster << " is Allocated" << std::endl;
 
       if (!BitMap(sede.FirstCluster)) 
-         cout << "Cluster " << sede.FirstCluster << " is Not Allocated" << endl;
-      */
+         std::cout << "Cluster " << sede.FirstCluster << " is Not Allocated" << std::endl;
    }
 
    int32_t BperS = (int32_t)pow(2, vbr.BytesPerSectorShift);
@@ -665,6 +680,7 @@ void parse_directory_entry_stream_ex_record(std::ifstream& dumpStream, int32_t& 
       memset(FILETBL[FILETBL_Index].FileEntryName, 0, 512);
    }
 
+   //TODO: old code that still has to be ported
    /*
    if (((sede.GeneralSecondaryFlags & 02) == 02) & (RootType == 192))
    {
@@ -768,14 +784,17 @@ bool parse_root_record(std::ifstream& dumpStream, uint8_t* rootLocData, int32_t&
       break;
    
    case 0xA0: 
+      //TODO: implement
       //parse_volume_guid_record();
       //RootLoc = RootLoc + 32;
       break;
    case 0xA1: 
+      //TODO: implement
       //parse_tex_fat_record();
       //RootLoc = RootLoc + 32;
       break;
    case 0xA2: 
+      //TODO: implement
       //parse_WCE_ACD_record();
       //RootLoc = RootLoc + 32;
       break;
@@ -819,7 +838,9 @@ void DumpRootDirectory(std::ifstream& dumpStream, uint32_t DEperS, uint32_t Firs
       {
          std::cout << "End Of Directory Sector Reached" << std::endl;
 
-         //this check does not work. FAT looks like to be empty in exfat
+         //TODO:
+         //I do not understand this - Fat is empty so this condition does not work.
+         //Need to figure this out.
 
          /*
          //We have to look at the FAT Chain to see if there are any more clusters
@@ -964,45 +985,6 @@ bool DumpDirectories(std::ifstream& dumpStream, const psvcd::FsSonyRoot& fsRoot,
    return true;
 }
 
-void dump_content(std::ifstream& dumpStream, const psvcd::FsSonyRoot& fsRoot, const psvcd::VBR& vbr, psvcd::FileTableEntry& fileRecord)
-{
-   int32_t BperS = (int32_t)pow(2, vbr.BytesPerSectorShift);
-
-   uint32_t cluster = fileRecord.DirFirstClusterAddr;
-   uint64_t dataLength = fileRecord.DataLength;
-
-   std::wstring fileName = std::wstring((wchar_t*)fileRecord.FileEntryName);
-   std::wstring filePath = L"D:\\dumps\\files\\" + fileName;
-
-   uint32_t sectorAddress = get_sectorAddress(fsRoot, vbr, cluster);
-   uint64_t nSectors = dataLength / BperS;
-   uint32_t tailSize = dataLength % BperS;
-   
-   std::ofstream str(filePath, std::ios::out | std::ios::binary);
-
-   //move to start cluster
-   dumpStream.seekg((sectorAddress * BperS), std::ios_base::beg);
-
-   for(uint64_t i = 0; i < nSectors; i++)
-   {
-      std::vector<uint8_t> resp_data(BperS);
-      dumpStream.read((char*)resp_data.data(), BperS);
-      
-      uint8_t* raw_data = resp_data.data();
-      str.write((const char*)raw_data, BperS);
-
-      sectorAddress++;
-   }
-
-   std::vector<uint8_t> resp_data_tail;
-   dumpStream.read((char*)resp_data_tail.data(), BperS);
-   
-   uint8_t* raw_data_tail = resp_data_tail.data();
-   str.write((const char*)raw_data_tail, tailSize);
-
-   std::cout << std::endl;
-}
-
 bool DumpFile(std::ifstream& dumpStream, int64_t byteOffset, uint64_t length, int32_t BperS, std::ofstream& filestream)
 {
    dumpStream.seekg(byteOffset);
@@ -1135,7 +1117,7 @@ void DumpMMCCard(boost::filesystem::path srcFilePath, boost::filesystem::path de
    if(!DumpFsSonyRoot(dumpStream, &fsRoot))
       return;
 
-   int32_t BperS0 = (int32_t)pow(2, fsRoot.BytesPerSectorShift); //Bytes per Sector
+   int32_t BperS0 = (int32_t)pow(2, fsRoot.BytesPerSectorShift); //Bytes per Sector TODO: not confirmed
 
    psvcd::VBR vbr;
    if(!DumpVBR(dumpStream, BperS0, fsRoot.FsOffset, &vbr))
