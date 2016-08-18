@@ -204,7 +204,7 @@ int main(int argc, char* argv[])
 {
    if(argc < 4)
    {
-      std::cout << "Usage: mode dest_dump_path initial_sector" << std::endl;
+      std::cout << "Usage: mode dest_dump_file_path initial_sector" << std::endl;
       std::cout << "Modes:" << std::endl;
       std::cout << "0 - enter dumpable mode" << std::endl;
       std::cout << "1 - dump mmc card" << std::endl;

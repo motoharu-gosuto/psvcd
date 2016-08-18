@@ -5,10 +5,10 @@ message(mmc_card)
 
 set(SOURCE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../${PROJECT_NAME})
 
-set(SOURCES ${SOURCE_PATH}/CMD56Initialization.h
-            ${SOURCE_PATH}/CMD56Initialization.cpp
-            ${SOURCE_PATH}/CMD56Packets.h
-            ${SOURCE_PATH}/CMD56Packets.cpp
+set(SOURCES #${SOURCE_PATH}/CMD56Initialization.h
+            #${SOURCE_PATH}/CMD56Initialization.cpp
+            #${SOURCE_PATH}/CMD56Packets.h
+            #${SOURCE_PATH}/CMD56Packets.cpp
             ${SOURCE_PATH}/main.cpp
             ${SOURCE_PATH}/MMCCommands.h
             ${SOURCE_PATH}/MMCCommands.cpp

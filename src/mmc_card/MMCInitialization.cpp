@@ -10,7 +10,7 @@
 #include <common/FTDIInitialization.h>
 
 #include "MMCInitialization.h"
-#include "CMD56Initialization.h"
+//#include "CMD56Initialization.h"
 #include "MMCCommands.h"
 
 //It is very interesting that PS Vita game cart can actually use any RCA
