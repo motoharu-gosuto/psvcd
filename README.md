@@ -460,7 +460,7 @@ Instead at sector zero you will find some SCEI specific structure that points to
 # Directory structure.
 
 The cart that I was trying to dump was "SAO - Hollow Fragment".
-Directory structure looks as following:
+Directory structure looks as following (will fix this list later. is is displayed incorrectly):
 
 - root
  - app
