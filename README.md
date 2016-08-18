@@ -539,7 +539,7 @@ Directory structure looks as following:
  - license
   - app
    - PCSG00294
-    - <id>.rif
+    - <key>.rif
  - psp2 
   - update
    - psp2updat.pup
