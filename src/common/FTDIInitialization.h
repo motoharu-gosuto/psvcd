@@ -6,9 +6,9 @@
 
 namespace psvcd {
 
-int ConfigureFTDIPort(FT_HANDLE ftHandle);
+bool ConfigureFTDIPort(FT_HANDLE ftHandle);
 
-int SyncMMPSE(FT_HANDLE ftHandle);
+bool SyncMMPSE(FT_HANDLE ftHandle);
 
 bool ConfigureSettings(FT_HANDLE ftHandle);
 

@@ -31,10 +31,10 @@ bool OpenDevice(FT_HANDLE& ftHandle)
    if(!psvcd::OpenDevice(index, ftHandle))
       return false;
 
-   if(psvcd::ConfigureFTDIPort(ftHandle) < 0)
+   if(!psvcd::ConfigureFTDIPort(ftHandle))
       return false;
 
-    if(psvcd::SyncMMPSE(ftHandle) < 0)
+    if(!psvcd::SyncMMPSE(ftHandle))
        return false;
 
    if(!psvcd::ConfigureSettings(ftHandle))

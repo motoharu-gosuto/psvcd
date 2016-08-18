@@ -51,39 +51,39 @@ bool CustomPurge(FT_HANDLE ftHandle)
    return true;
 }
 
-int psvcd::ConfigureFTDIPort(FT_HANDLE ftHandle)
+bool psvcd::ConfigureFTDIPort(FT_HANDLE ftHandle)
 {
    if(!ResetDevice(ftHandle))
-      return -1;
+      return false;
 
    if(!CustomPurge(ftHandle))
-      return -1;
+      return false;
 
    if(!SetUSBParameters(ftHandle, 65536, 65535)) //Set USB request transfer sizes to 64K
-      return -1;
+      return false;
 
    if(!SetChars(ftHandle, false, 0, false, 0)) //Disable event and error characters
-      return -1;
+      return false;
    
    if(!SetTimeouts(ftHandle, 0, 5000)) //Sets the read and write timeouts in milliseconds
-      return -1;
+      return false;
    
    if(!SetLatencyTimer(ftHandle, 1)) //Set the latency timer to 1mS (default is 16mS)
-      return -1;
+      return false;
 
    if(!SetFlowControl(ftHandle, FT_FLOW_RTS_CTS, 0x0, 0x0)) //Turn on flow control to synchronize IN requests
-      return -1;
+      return false;
 
    if(!SetBitMode(ftHandle, 0x00, 0x00)) //Reset controller
-      return -1;
+      return false;
 
    if(!SetBitMode(ftHandle, 0x00, FT_BITMODE_MPSSE)) //Enable MPSSE mode
-      return -1;
+      return false;
 
    // Wait for all the USB stuff to complete and work
    std::this_thread::sleep_for(std::chrono::milliseconds(50));
 
-   return 0;
+   return true;
 }
 
 bool EnableLoopback(FT_HANDLE ftHandle)
@@ -292,21 +292,21 @@ bool SyncMPSSE(FT_HANDLE ftHandle, BYTE command)
    return true;
 }
 
-int psvcd::SyncMMPSE(FT_HANDLE ftHandle)
+bool psvcd::SyncMMPSE(FT_HANDLE ftHandle)
 {
    if(!EnableLoopback(ftHandle))
-      return -1;
+      return false;
 
    if(!SyncMPSSE(ftHandle, 0xAA))
-      return -1;
+      return false;
 
    if(!SyncMPSSE(ftHandle, 0xAB))
-      return -1;
+      return false;
 
    if(!DisableLoopback(ftHandle))
-      return -1;
+      return false;
   
-   return 0;
+   return true;
 }
 
 bool psvcd::ConfigureSettings(FT_HANDLE ftHandle)
