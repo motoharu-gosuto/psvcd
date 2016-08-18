@@ -101,7 +101,11 @@ bool psvcd::CMD2_MMC(FT_HANDLE ftHandle)
          return false;
       }      
 
-      uint8_t crc7 = psvcd::CRC_7(resp.data(), 16);
+      //look at check byte
+      if(resp.front() != 0x3F)
+         return false;
+
+      uint8_t crc7 = psvcd::CRC_7(resp.data() + 1, 15);
       bool valid = crc7 == resp.back();
 
       std::cout << "valid: " << valid << std::endl;
@@ -186,8 +190,12 @@ bool psvcd::CMD9_MMC(FT_HANDLE ftHandle, WORD RCA)
       }
 
       //validate
+
+      //look at check byte
+      if(resp.front() != 0x3F)
+         return false;
       
-      uint8_t crc7 = psvcd::CRC_7(resp.data(), 16);
+      uint8_t crc7 = psvcd::CRC_7(resp.data() + 1, 15);
       bool valid = crc7 == resp.back();
 
       std::cout << "valid: " << valid << std::endl;
@@ -838,6 +846,7 @@ bool psvcd::CMD15_MMC(FT_HANDLE ftHandle, WORD RCA)
    return true;
 }
 
+//TODO: not sure if this command is supported by PS Vita game carts
 bool psvcd::CMD19_MMC(FT_HANDLE ftHandle)
 {
    std::cout << "CMD19" << std::endl;

@@ -43,7 +43,7 @@ bool OpenDevice(FT_HANDLE& ftHandle)
    return true;
 }
 
-int standalone_initialize_card()
+int standalone_initialize_mmc()
 {
    FT_HANDLE ftHandle;
 
@@ -167,37 +167,68 @@ bool parseBool(const char* val)
    return parsedValue;
 }
 
-uint32_t parseUint32Hex(const char* val)
+uint32_t parseUint32(const char* val)
 {
-   std::string initialClusterStr(val);
-   
-   if(initialClusterStr.find("0x") != std::string::npos)
-      initialClusterStr = initialClusterStr.substr(2);
+   std::string initialValueStr(val);
 
    uint32_t parsedValue = 0;
 
    std::stringstream ss;
-   ss << initialClusterStr;
+   ss << initialValueStr;
+   ss >> parsedValue;
+
+   return parsedValue;
+}
+
+uint32_t parseUint32Hex(const char* val)
+{
+   std::string initialValueStr(val);
+   
+   if(initialValueStr.find("0x") != std::string::npos)
+      initialValueStr = initialValueStr.substr(2);
+
+   uint32_t parsedValue = 0;
+
+   std::stringstream ss;
+   ss << initialValueStr;
    ss >> std::hex >> parsedValue;
 
    return parsedValue;
 }
 
+#define ENTER_DUMPABLE_MODE 0
+#define DUMP_MMC_CARD 1
+#define STANDALONE_INITIALIZE_MMC 2
+
 int main(int argc, char* argv[])
 {
    if(argc < 4)
    {
-      std::cout << "Usage: enter_dumpable_mode dest_dump_path initial_sector" << std::endl;
+      std::cout << "Usage: mode dest_dump_path initial_sector" << std::endl;
+      std::cout << "Modes:" << std::endl;
+      std::cout << "0 - enter dumpable mode" << std::endl;
+      std::cout << "1 - dump mmc card" << std::endl;
+      std::cout << "2 - standalone initialization" << std::endl;
       return -1;
    }
    
    //TODO: this can be done much easier and informative with boost
-   bool enterDumpableMode = parseBool(argv[1]);
+   uint32_t mode = parseUint32(argv[1]);
    std::string filePath(argv[2]);
    uint32_t initialCluster = parseUint32Hex(argv[3]);
   
-   if(enterDumpableMode)
+   switch(mode)
+   {
+   case ENTER_DUMPABLE_MODE:
       return enter_dumpable_mode();
-   else
+   case DUMP_MMC_CARD:
       return dump_mmc_card(filePath, initialCluster);
+   case STANDALONE_INITIALIZE_MMC:
+      return standalone_initialize_mmc();
+   default:
+      {
+         std::cout << "Invalid mode is specified" << std::endl;
+         return -1;
+      }
+   }
 }
