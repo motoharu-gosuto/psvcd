@@ -612,3 +612,14 @@ There are three executables and one library in total:
    This is a long process and it can be interupted by transmission errors. However you can continue dump after failure by specifying different cluster address.
    Different destination file can also be specified if you wish to manually merge parts of the dump. For example in WinHex.
 - dump_exfat: this one basically takes raw dump of PS Vita game cart and extracts all the directory hierarchy and the files to specified location.
+
+# How to dump PS Vita game cart and get the files.
+
+After you have bypassed CMD56 initialization step by using DIP switches do the following.
+- Run mmc_card executable with mode = 0. This will switch game cart to 1-bit bus low frequency mode.
+- Run mmc_card executable with mode = 1. Specify destination binary file path and start cluster address (should be zero on first run).
+- Wait. Seriously wait. Dump can take around 20 hours for 3.5 GB of data. I do not have exact time metrics but I am going to measure total time that can be required for dump.
+
+When dump is finished you should obtain binary file that is basically snapshot of game cart filesystem.
+Pass this file to dump_exefat executable and specify destination directory path. 
+This tool then should extract all the files and create corresponding directory structure in the destination folder.
