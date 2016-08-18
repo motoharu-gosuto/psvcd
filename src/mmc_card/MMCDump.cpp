@@ -277,25 +277,25 @@ bool CMD23_18_Retry(FT_HANDLE ftHandle, int32_t SperC, int32_t BperS, uint32_t c
 
 //==========================================================
 
-bool DumpFsSonyRoot(FT_HANDLE ftHandle, FsSonyRoot* root)
+bool DumpFsSonyRoot(FT_HANDLE ftHandle, psvcd::FsSonyRoot* root)
 {
    std::vector<BYTE> resp_data;
    if(!RetryCMD17(ftHandle, 0x00000000, resp_data))
       return false;
 
-   memset(root, 0, sizeof(FsSonyRoot));
+   memset(root, 0, sizeof(psvcd::FsSonyRoot));
    memcpy(root, resp_data.data(), resp_data.size());
 
    return true;
 }
 
-bool DumpVBR(FT_HANDLE ftHandle, VBR* vbr, uint32_t vbr_address)
+bool DumpVBR(FT_HANDLE ftHandle, psvcd::VBR* vbr, uint32_t vbr_address)
 {
    std::vector<BYTE> resp_data;
    if(!RetryCMD17(ftHandle, vbr_address, resp_data))
       return false;
 
-   memset(vbr, 0, sizeof(VBR));
+   memset(vbr, 0, sizeof(psvcd::VBR));
    memcpy(vbr, resp_data.data(), resp_data.size());
 
    return true;
@@ -303,7 +303,7 @@ bool DumpVBR(FT_HANDLE ftHandle, VBR* vbr, uint32_t vbr_address)
 
 //==========================================================
 
-bool DumpByCluster(FT_HANDLE ftHandle, const FsSonyRoot& fsRoot, const VBR& vbr, uint32_t initialCluster, uint32_t& failedCluster, std::string filePath)
+bool DumpByCluster(FT_HANDLE ftHandle, const psvcd::FsSonyRoot& fsRoot, const psvcd::VBR& vbr, uint32_t initialCluster, uint32_t& failedCluster, std::string filePath)
 {
    int32_t BperS = (int32_t)pow(2, vbr.BytesPerSectorShift);
    int32_t SperC = (int32_t)pow(2, vbr.SectorsPerClusterShift);

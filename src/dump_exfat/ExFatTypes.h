@@ -6,6 +6,10 @@
 
 #define SCEIidConstant "Sony Computer Entertainment Inc."
 
+#define EXFATContant "EXFAT   "
+
+namespace psvcd {
+
 struct FsSonyRoot
 {
    uint8_t  SCEIid[32];
@@ -30,8 +34,6 @@ struct FsSonyRoot
    uint8_t  BootCode[398];
    uint8_t  Signature[2];
 };
-
-#define EXFATContant "EXFAT   "
 
 struct VBR
 {
@@ -152,6 +154,8 @@ struct FileTableEntry
    uint8_t FileEntryName[512]; //max filename is 255*2 = 510 + 2 bytes for null terminator
    uint64_t DataLength;
    uint64_t ValidDataLength;
+};
+
 };
 
 #pragma pack(pop)

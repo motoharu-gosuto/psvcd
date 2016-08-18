@@ -34,10 +34,10 @@ std::vector<std::vector<uint8_t> > UpCaseTableDataSectors;
 bool DirInProgress = false;
 bool FileInProgress = false;
 
-std::vector<DirTableEntry> DIRTBL;
+std::vector<psvcd::DirTableEntry> DIRTBL;
 int32_t  DIRTBL_Index = 0;
 
-std::vector<FileTableEntry> FILETBL;
+std::vector<psvcd::FileTableEntry> FILETBL;
 int32_t FILETBL_Index = 0;
 
 signed int NameOffset;
@@ -45,7 +45,7 @@ signed int NameOffset;
 uint32_t  CurrentClus; //Cluster Being Processed
 uint32_t  NextCluster; //for computing the next cluster in a chain
 
-bool ReadSector(std::ifstream& dumpStream, const VBR& vbr, uint32_t sectorAddress, std::vector<uint8_t>& resp_data)
+bool ReadSector(std::ifstream& dumpStream, const psvcd::VBR& vbr, uint32_t sectorAddress, std::vector<uint8_t>& resp_data)
 {
    int32_t BperS = (int32_t)pow(2, vbr.BytesPerSectorShift);
 
@@ -65,44 +65,44 @@ bool ReadSector(std::ifstream& dumpStream, int32_t BperS, uint32_t sectorAddress
    return true;
 }
 
-bool DumpFsSonyRoot(std::ifstream& dumpStream, FsSonyRoot* root)
+bool DumpFsSonyRoot(std::ifstream& dumpStream, psvcd::FsSonyRoot* root)
 {
    dumpStream.seekg(0x0000000000000000, std::ios_base::beg);
-   memset(root, 0, sizeof(FsSonyRoot));
-   dumpStream.read((char*)root, sizeof(FsSonyRoot));
+   memset(root, 0, sizeof(psvcd::FsSonyRoot));
+   dumpStream.read((char*)root, sizeof(psvcd::FsSonyRoot));
    return true;
 }
 
-bool DumpVBR(std::ifstream& dumpStream, int32_t BperS, uint32_t vbr_address, VBR* vbr)
+bool DumpVBR(std::ifstream& dumpStream, int32_t BperS, uint32_t vbr_address, psvcd::VBR* vbr)
 {
    int64_t address = BperS * vbr_address;
    dumpStream.seekg(address, std::ios_base::beg);
-   memset(vbr, 0, sizeof(VBR));
-   dumpStream.read((char*)vbr, sizeof(VBR));
+   memset(vbr, 0, sizeof(psvcd::VBR));
+   dumpStream.read((char*)vbr, sizeof(psvcd::VBR));
    return true;
 }
 
-bool DumpFAT(std::ifstream& dumpStream, const VBR& vbr, uint32_t fat_address, FAT* fat)
+bool DumpFAT(std::ifstream& dumpStream, const psvcd::VBR& vbr, uint32_t fat_address, psvcd::FAT* fat)
 {
    int32_t BperS = (int32_t)pow(2, vbr.BytesPerSectorShift);
 
    int64_t address = BperS * fat_address;
    dumpStream.seekg(address, std::ios_base::beg);
-   memset(fat, 0, sizeof(FAT));
-   dumpStream.read((char*)fat, sizeof(FAT));
+   memset(fat, 0, sizeof(psvcd::FAT));
+   dumpStream.read((char*)fat, sizeof(psvcd::FAT));
    return true;
 }
 
 //This function will look at all FAT entries and count cell variations
 
-void FatWalk(std::ifstream& dumpStream, const FsSonyRoot& fsRoot, const VBR& vbr)
+void FatWalk(std::ifstream& dumpStream, const psvcd::FsSonyRoot& fsRoot, const psvcd::VBR& vbr)
 {
    uint32_t CntFF = 0; //Count End Of Chains
    uint32_t CntZE = 0; //Count Zero Records
    uint32_t CntF7 = 0; //Count Bad Blocks
    uint32_t NonZero = 0; //All Else
 
-   FAT fat;
+   psvcd::FAT fat;
    uint32_t prevFatSector = -1;
 
    for (uint32_t i = 2; i < vbr.ClusterCount + 2; i++)
@@ -141,7 +141,7 @@ void FatWalk(std::ifstream& dumpStream, const FsSonyRoot& fsRoot, const VBR& vbr
 
 //This function will walk the FAT chain and print the clusters in order
 
-uint32_t WalkFatChain(std::ifstream& dumpStream, uint32_t FirstCluster, const FsSonyRoot& fsRoot, const VBR& vbr)
+uint32_t WalkFatChain(std::ifstream& dumpStream, uint32_t FirstCluster, const psvcd::FsSonyRoot& fsRoot, const psvcd::VBR& vbr)
 {
     uint32_t FatCellAddr; //For current Cell Address
         
@@ -156,7 +156,7 @@ uint32_t WalkFatChain(std::ifstream& dumpStream, uint32_t FirstCluster, const Fs
     uint32_t firstFatSector = fsRoot.FsOffset + vbr.FatOffset;
     uint32_t currentFatSector = firstFatSector + sectorOffset;
 
-    FAT fat;
+    psvcd::FAT fat;
     if(!DumpFAT(dumpStream, vbr, currentFatSector, &fat))
        throw std::runtime_error("Failed to dump FAT");
 
@@ -197,7 +197,7 @@ bool BitMap(uint32_t cluster)
 
 //This functions will Dump the entire allocation map
 
-void DumpBitMap(std::ifstream& dumpStream, const VBR& vbr)
+void DumpBitMap(std::ifstream& dumpStream, const psvcd::VBR& vbr)
 {
    uint32_t Blocks = vbr.ClusterCount;
 
@@ -273,7 +273,7 @@ void DumpBitMap(std::ifstream& dumpStream, const VBR& vbr)
    std::cout << Blocks << " Total allocation units on disk." << std::endl << CntUnAlloc << " Allocation units available on disk." << std::endl << CntAlloc << " Allocation units in use." << std::endl;
 }
 
-void dump_other(std::ifstream& dumpStream, const FsSonyRoot& fsRoot, const VBR& vbr)
+void dump_other(std::ifstream& dumpStream, const psvcd::FsSonyRoot& fsRoot, const psvcd::VBR& vbr)
 {
     //cout << "Dumping Bit Allocation Map" << endl;
     //DumpBitMap(ftHandle, VBR);
@@ -286,7 +286,7 @@ void dump_other(std::ifstream& dumpStream, const FsSonyRoot& fsRoot, const VBR& 
     //cout << "VBR Checksum Calculation " << VBRChecksum(&MainVBR[0], 5632) << endl;
 }
 
-uint32_t get_sectorAddress(const FsSonyRoot& fsRoot, const VBR& vbr, uint32_t cluster)
+uint32_t get_sectorAddress(const psvcd::FsSonyRoot& fsRoot, const psvcd::VBR& vbr, uint32_t cluster)
 {
    int32_t BperS = (int32_t)pow(2, vbr.BytesPerSectorShift);
    int32_t SperC = (int32_t)pow(2, vbr.SectorsPerClusterShift);
@@ -302,29 +302,29 @@ void parse_volume_record(int32_t& sectorOffset, const uint8_t* rootLocData)
 {
     std::cout << "Volume Record" << std::endl;
     
-    VolumeLabelDirectoryEntry  vlde;
-    memset(&vlde, 0, sizeof(VolumeLabelDirectoryEntry));
+    psvcd::VolumeLabelDirectoryEntry  vlde;
+    memset(&vlde, 0, sizeof(psvcd::VolumeLabelDirectoryEntry));
 
     const uint8_t* start = rootLocData + sectorOffset;
-    memcpy(&vlde, start, sizeof(VolumeLabelDirectoryEntry));
-    sectorOffset = sectorOffset + sizeof(VolumeLabelDirectoryEntry);
+    memcpy(&vlde, start, sizeof(psvcd::VolumeLabelDirectoryEntry));
+    sectorOffset = sectorOffset + sizeof(psvcd::VolumeLabelDirectoryEntry);
 
     std::cout << "Volume Label Size is " << (int)vlde.CharacterCount << " characters, Label:" << std::endl;
     std::wcout << std::wstring(vlde.VolumeLabel, vlde.CharacterCount) << std::endl;
 }
 
-void parse_bitmap_table_record(std::ifstream& dumpStream, int32_t& sectorOffset, const uint8_t* rootLocData, const FsSonyRoot& fsRoot, const VBR& vbr)
+void parse_bitmap_table_record(std::ifstream& dumpStream, int32_t& sectorOffset, const uint8_t* rootLocData, const psvcd::FsSonyRoot& fsRoot, const psvcd::VBR& vbr)
 {
    int32_t SperC = (int32_t)pow(2, vbr.SectorsPerClusterShift);
 
    std::cout << "Bitmap Table Record" << std::endl;
 
-   AllocationBitMapEntry abme;
-   memset(&abme, 0, sizeof(AllocationBitMapEntry));
+   psvcd::AllocationBitMapEntry abme;
+   memset(&abme, 0, sizeof(psvcd::AllocationBitMapEntry));
 
    const uint8_t* start = rootLocData + sectorOffset;
-   memcpy(&abme, start, sizeof(AllocationBitMapEntry));
-   sectorOffset = sectorOffset + sizeof(AllocationBitMapEntry);
+   memcpy(&abme, start, sizeof(psvcd::AllocationBitMapEntry));
+   sectorOffset = sectorOffset + sizeof(psvcd::AllocationBitMapEntry);
 
    std::cout << "Bit Map First Cluster " << abme.FirstCluster << std::endl;
    std::cout << "Bit Map Data Length " << abme.DataLength << std::endl;
@@ -356,18 +356,18 @@ void parse_bitmap_table_record(std::ifstream& dumpStream, int32_t& sectorOffset,
       std::cout << "Cluster " << abme.FirstCluster << " is Not Allocated" << std::endl;
 }
 
-void parse_up_case_table_record(std::ifstream& dumpStream, int32_t& sectorOffset, const uint8_t* rootLocData, const FsSonyRoot& fsRoot, const VBR& vbr)
+void parse_up_case_table_record(std::ifstream& dumpStream, int32_t& sectorOffset, const uint8_t* rootLocData, const psvcd::FsSonyRoot& fsRoot, const psvcd::VBR& vbr)
 {
    int32_t SperC = (int32_t)pow(2, vbr.SectorsPerClusterShift);
 
    std::cout << "Up Case Table Record" << std::endl;
 
-   UpCaseTableEntry ucte;
-   memset(&ucte, 0, sizeof(UpCaseTableEntry));
+   psvcd::UpCaseTableEntry ucte;
+   memset(&ucte, 0, sizeof(psvcd::UpCaseTableEntry));
 
    const uint8_t* start = rootLocData + sectorOffset;
-   memcpy(&ucte, start, sizeof(UpCaseTableEntry));
-   sectorOffset = sectorOffset + sizeof(UpCaseTableEntry);
+   memcpy(&ucte, start, sizeof(psvcd::UpCaseTableEntry));
+   sectorOffset = sectorOffset + sizeof(psvcd::UpCaseTableEntry);
 
    std::cout << "UP Case Table Checksum " << ucte.TableChecksum << std::endl;
    std::cout << "Up Case Table First Cluster " << ucte.FirstCluster << std::endl;
@@ -401,12 +401,12 @@ void parse_up_case_table_record(std::ifstream& dumpStream, int32_t& sectorOffset
 
 void parse_directory_entry_record(int32_t& sectorOffset, const uint8_t* rootLocData, uint8_t RootType, uint32_t parentCluster)
 {
-   DirectoryEntry de;
-   memset(&de, 0, sizeof(DirectoryEntry));
+   psvcd::DirectoryEntry de;
+   memset(&de, 0, sizeof(psvcd::DirectoryEntry));
 
    const uint8_t* start = rootLocData + sectorOffset;
-   memcpy(&de, start, sizeof(DirectoryEntry));
-   sectorOffset = sectorOffset + sizeof(DirectoryEntry);
+   memcpy(&de, start, sizeof(psvcd::DirectoryEntry));
+   sectorOffset = sectorOffset + sizeof(psvcd::DirectoryEntry);
 
    //uint16_t   CalcChecksum; //returned checksum
 
@@ -448,7 +448,7 @@ void parse_directory_entry_record(int32_t& sectorOffset, const uint8_t* rootLocD
       DirInProgress = true; //Processing a chained dir
       DIRTBL_Index++; //record a directory entry
       NameOffset = 0; //indexing for directory name
-      DIRTBL.push_back(DirTableEntry());
+      DIRTBL.push_back(psvcd::DirTableEntry());
       DIRTBL[DIRTBL_Index].DirEntCode = RootType; //save in diretory table
       DIRTBL[DIRTBL_Index].DirParent = parentCluster; //Save Parent Cluster Value
    }
@@ -458,7 +458,7 @@ void parse_directory_entry_record(int32_t& sectorOffset, const uint8_t* rootLocD
       FileInProgress = true;
       FILETBL_Index++;
       NameOffset = 0;
-      FILETBL.push_back(FileTableEntry());
+      FILETBL.push_back(psvcd::FileTableEntry());
       FILETBL[FILETBL_Index].DirEntCode = RootType; //save in diretory table
       FILETBL[FILETBL_Index].DirParent = parentCluster; //Save Parent Cluster Value
    }
@@ -578,14 +578,14 @@ void parse_directory_entry_record(int32_t& sectorOffset, const uint8_t* rootLocD
    }
 }
 
-void parse_directory_entry_stream_ex_record(std::ifstream& dumpStream, int32_t& sectorOffset, const uint8_t* rootLocData, const FsSonyRoot& fsRoot, const VBR& vbr, uint8_t RootType)
+void parse_directory_entry_stream_ex_record(std::ifstream& dumpStream, int32_t& sectorOffset, const uint8_t* rootLocData, const psvcd::FsSonyRoot& fsRoot, const psvcd::VBR& vbr, uint8_t RootType)
 {
-   StreamExtensionDirectoryEntry sede;
-   memset(&sede, 0, sizeof(StreamExtensionDirectoryEntry));
+   psvcd::StreamExtensionDirectoryEntry sede;
+   memset(&sede, 0, sizeof(psvcd::StreamExtensionDirectoryEntry));
 
    const uint8_t* start = rootLocData + sectorOffset;
-   memcpy(&sede, start, sizeof(StreamExtensionDirectoryEntry));
-   sectorOffset = sectorOffset + sizeof(StreamExtensionDirectoryEntry);
+   memcpy(&sede, start, sizeof(psvcd::StreamExtensionDirectoryEntry));
+   sectorOffset = sectorOffset + sizeof(psvcd::StreamExtensionDirectoryEntry);
 
    if (RootType == 64)  
       std::cout << "Directory Entry Record, Stream Extension (Deleted)" << std::endl;
@@ -677,12 +677,12 @@ void parse_directory_entry_stream_ex_record(std::ifstream& dumpStream, int32_t& 
 
 void parse_directory_entry_file_name_ex_record(int32_t& sectorOffset, const uint8_t* rootLocData, uint8_t RootType)
 {
-   FileNameDirectoryEntry fnde;
-   memset(&fnde, 0, sizeof(FileNameDirectoryEntry));
+   psvcd::FileNameDirectoryEntry fnde;
+   memset(&fnde, 0, sizeof(psvcd::FileNameDirectoryEntry));
 
    const uint8_t* start = rootLocData + sectorOffset;
-   memcpy(&fnde, start, sizeof(FileNameDirectoryEntry));
-   sectorOffset = sectorOffset + sizeof(FileNameDirectoryEntry);
+   memcpy(&fnde, start, sizeof(psvcd::FileNameDirectoryEntry));
+   sectorOffset = sectorOffset + sizeof(psvcd::FileNameDirectoryEntry);
 
    if (RootType == 65) 
       std::cout << "Directory Entry Record, File Name Extension (Deleted)" << std::endl;
@@ -722,7 +722,7 @@ void parse_directory_entry_file_name_ex_record(int32_t& sectorOffset, const uint
    }
 }
 
-bool parse_root_record(std::ifstream& dumpStream, uint8_t* rootLocData, int32_t& sectorOffset, uint8_t RootType, uint32_t RootIndex, uint32_t RootLocSector, uint32_t FirstClus, const FsSonyRoot& fsRoot, const VBR& vbr)
+bool parse_root_record(std::ifstream& dumpStream, uint8_t* rootLocData, int32_t& sectorOffset, uint8_t RootType, uint32_t RootIndex, uint32_t RootLocSector, uint32_t FirstClus, const psvcd::FsSonyRoot& fsRoot, const psvcd::VBR& vbr)
 {
    std::cout << std::endl << "Seeking sector: " << RootLocSector << ", For Directory Index: " << RootIndex << ", " << std::endl;
 
@@ -793,7 +793,7 @@ bool parse_root_record(std::ifstream& dumpStream, uint8_t* rootLocData, int32_t&
    return true;
 }
 
-void DumpRootDirectory(std::ifstream& dumpStream, uint32_t DEperS, uint32_t FirstClus, uint32_t FatSector, const FsSonyRoot& fsRoot, const VBR& vbr)
+void DumpRootDirectory(std::ifstream& dumpStream, uint32_t DEperS, uint32_t FirstClus, uint32_t FatSector, const psvcd::FsSonyRoot& fsRoot, const psvcd::VBR& vbr)
 {
    int32_t BperS = (int32_t)pow(2, vbr.BytesPerSectorShift);
 
@@ -891,10 +891,10 @@ void DumpRootDirectory(std::ifstream& dumpStream, uint32_t DEperS, uint32_t Firs
    return;
 }
 
-bool DumpDirectories(std::ifstream& dumpStream, const FsSonyRoot& fsRoot, const VBR& vbr)
+bool DumpDirectories(std::ifstream& dumpStream, const psvcd::FsSonyRoot& fsRoot, const psvcd::VBR& vbr)
 {
-   DIRTBL.push_back(DirTableEntry());
-   FILETBL.push_back(FileTableEntry());
+   DIRTBL.push_back(psvcd::DirTableEntry());
+   FILETBL.push_back(psvcd::FileTableEntry());
 
    int32_t BperS = (int32_t)pow(2, vbr.BytesPerSectorShift);
    int32_t SperC = (int32_t)pow(2, vbr.SectorsPerClusterShift);
@@ -964,7 +964,7 @@ bool DumpDirectories(std::ifstream& dumpStream, const FsSonyRoot& fsRoot, const 
    return true;
 }
 
-void dump_content(std::ifstream& dumpStream, const FsSonyRoot& fsRoot, const VBR& vbr, FileTableEntry& fileRecord)
+void dump_content(std::ifstream& dumpStream, const psvcd::FsSonyRoot& fsRoot, const psvcd::VBR& vbr, psvcd::FileTableEntry& fileRecord)
 {
    int32_t BperS = (int32_t)pow(2, vbr.BytesPerSectorShift);
 
@@ -1024,7 +1024,7 @@ bool DumpFile(std::ifstream& dumpStream, int64_t byteOffset, uint64_t length, in
    return true;
 }
 
-bool DumpFiles(std::ifstream& dumpStream, const FsSonyRoot& fsRoot, const VBR& vbr, const std::unordered_map<uint32_t, boost::filesystem::path>& fullPaths)
+bool DumpFiles(std::ifstream& dumpStream, const psvcd::FsSonyRoot& fsRoot, const psvcd::VBR& vbr, const std::unordered_map<uint32_t, boost::filesystem::path>& fullPaths)
 {
    int32_t BperS = (int32_t)pow(2, vbr.BytesPerSectorShift);
 
@@ -1131,13 +1131,13 @@ void DumpMMCCard(boost::filesystem::path srcFilePath, boost::filesystem::path de
 {
    std::ifstream dumpStream(srcFilePath.generic_string().c_str(), std::ios::in | std::ios::binary);
 
-   FsSonyRoot fsRoot;
+   psvcd::FsSonyRoot fsRoot;
    if(!DumpFsSonyRoot(dumpStream, &fsRoot))
       return;
 
    int32_t BperS0 = (int32_t)pow(2, fsRoot.BytesPerSectorShift); //Bytes per Sector
 
-   VBR vbr;
+   psvcd::VBR vbr;
    if(!DumpVBR(dumpStream, BperS0, fsRoot.FsOffset, &vbr))
       return;
 
@@ -1145,7 +1145,7 @@ void DumpMMCCard(boost::filesystem::path srcFilePath, boost::filesystem::path de
    int32_t SperC = (int32_t)pow(2, vbr.SectorsPerClusterShift); //Sectors per Cluster
    int32_t BperC = BperS * SperC; //Bytes per Cluster
 
-   FAT fat;
+   psvcd::FAT fat;
    uint32_t FatSector = fsRoot.FsOffset + vbr.FatOffset;
    if(!DumpFAT(dumpStream, vbr, FatSector, &fat))
       return;
