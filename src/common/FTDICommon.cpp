@@ -216,7 +216,7 @@ bool psvcd::SetLatencyTimer(FT_HANDLE ftHandle, UCHAR ucLatency)
 
    if (ftStatus == FT_OK) 
    {
-      std::cout << "SetLatencyTimer complete";
+      std::cout << "SetLatencyTimer complete" << std::endl;
       return true;
    } 
    else 
@@ -233,7 +233,7 @@ bool psvcd::SetUSBParameters(FT_HANDLE ftHandle, ULONG ulInTransferSize, ULONG u
 
    if (ftStatus == FT_OK) 
    {
-      std::cout << "SetUSBParameters complete";
+      std::cout << "SetUSBParameters complete" << std::endl;
       return true;
    } 
    else 
@@ -250,7 +250,7 @@ bool psvcd::SetFlowControl(FT_HANDLE ftHandle, USHORT FlowControl, UCHAR XonChar
 
    if (ftStatus == FT_OK) 
    {
-      std::cout << "SetFlowControl complete";
+      std::cout << "SetFlowControl complete" << std::endl;
       return true;
    } 
    else 
@@ -267,7 +267,7 @@ bool psvcd::Purge(FT_HANDLE ftHandle, ULONG Mask)
 
    if (ftStatus == FT_OK) 
    {
-      std::cout << "Purge complete";
+      std::cout << "Purge complete" << std::endl;
       return true;
    } 
    else 
@@ -284,7 +284,7 @@ bool psvcd::ResetDevice(FT_HANDLE ftHandle)
 
    if (ftStatus == FT_OK) 
    {
-      std::cout << "Reset complete";
+      std::cout << "Reset complete" << std::endl;
       return true;
    } 
    else 
@@ -301,7 +301,7 @@ bool psvcd::CyclePort(FT_HANDLE ftHandle)
 
    if (ftStatus == FT_OK) 
    {
-      std::cout << "CyclePort complete";
+      std::cout << "CyclePort complete" << std::endl;
       return true;
    } 
    else 
@@ -318,7 +318,7 @@ bool psvcd::SetTimeouts(FT_HANDLE ftHandle, DWORD dwReadTimeout, DWORD dwWriteTi
 
    if (ftStatus == FT_OK) 
    {
-      std::cout << "SetTimeouts complete";
+      std::cout << "SetTimeouts complete" << std::endl;
       return true;
    } 
    else 
@@ -335,7 +335,7 @@ bool psvcd::SetChars(FT_HANDLE ftHandle, UCHAR uEventCh, UCHAR uEventChEn, UCHAR
 
    if (ftStatus == FT_OK) 
    {
-      std::cout << "SetChars complete";
+      std::cout << "SetChars complete" << std::endl;
       return true;
    } 
    else 
