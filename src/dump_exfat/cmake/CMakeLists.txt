@@ -6,7 +6,9 @@ message(dump_exfat)
 set(SOURCE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../${PROJECT_NAME})
 
 set(SOURCES ${SOURCE_PATH}/ExFatTypes.h
+            ${SOURCE_PATH}/DumpExfat.h
             ${SOURCE_PATH}/DumpExfat.cpp
+            ${SOURCE_PATH}/main.cpp
             )
 
 add_executable(dump_exfat ${SOURCES})

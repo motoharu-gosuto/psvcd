@@ -14,6 +14,7 @@
 #include <unordered_map>
 
 #include "ExFatTypes.h"
+#include "DumpExfat.h"
 
 //The largest cluster number allowed
 #define F6 0xFFFFFFF6
@@ -1164,13 +1165,3 @@ void DumpMMCCard(boost::filesystem::path srcFilePath, boost::filesystem::path de
    return;
 }
 
-int main(int argc, char* argv[])
-{
-   //TODO:add cmd line args
-   boost::filesystem::path srcFilePath;
-   boost::filesystem::path destRootPath;
-
-   DumpMMCCard(srcFilePath, destRootPath);
-
-	return 0;
-}
