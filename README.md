@@ -313,6 +313,26 @@ GPIOL AD4, AD6, AD7 pins are not used so they are not connected.
 
 DOUT, DIN/DWAIT lines can be pulled together either to GND or to VCC by using jumpers JP21 or JP22.
 
+## Why FT232h. MPSSE Mode Description.
+
+Choice of FTDI FT232h chip was not spontaneous. There are two main reasons for this:
+- It allows easy interfacing with other devices through USB
+- It allows to implement custom protocol with special MPSSE mode if having standard interfaces like UART, FIFO, SPI is not enough for you.
+
+Basically MPSSE mode is the special mode of FT232h where you send commands to the chip through USB and they are translated into signals.
+Main features that may be useful for custom protocol include:
+- Single CLK line
+- Single DIN line
+- Single DOUT line
+- Single Wait line
+- 3 GPIO Low pins
+- 7 GPIO High pins
+
+Using this MPSSE mode I have implemented variation of MMC protocol which uses 1-bit width bus and low frequency mode to transfer the data in both directions.
+
+I also use FT232h in FIFO mode together with FPGA when I need to investigate packets on the data line.
+And there are many other ways FT232h can be used as well.
+
 # Interconnections. Connecting PS Vita, game cart and custom board.
 
 Most of the custom board connections are soldered. But I tried to keep custom board as much generic as I could.
@@ -330,6 +350,14 @@ There is some additional wiring required as well.
 - Use female pin header SV4 to connect GND line with corresponding pins of the game cart. You can use SV1 or SV2 for this.
 - Connect CLK pin of FT232h with corresponding pin of the game cart. You can use SV1 or SV2 for this.
 - From jumpers JP1-JP10 select those that you have used for CLK, CMD and DAT0 lines. Place these three jumpers to pull-up the lines.
+
+Consider looking at pics/pic9.png which shows final result.
+You may notice one difference to the schematic - WAIT-DIN wire should not be there.
+Basically I did not solder this two wires together so I had to place a connection wire.
+
+Final connection with PS Vita wired together is shown on picture pics/pic10.png
+You may notice that I had connected everything to the prototype board. 
+Basically I did not have 1x10 DIP switches so I had to manually switch wires.
 
 # PS Vita game cart protocol.
 
