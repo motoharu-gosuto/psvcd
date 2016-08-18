@@ -4,9 +4,14 @@
 
 int main(int argc, char* argv[])
 {
-   //TODO:add cmd line args
-   boost::filesystem::path srcFilePath;
-   boost::filesystem::path destRootPath;
+   if(argc < 3)
+   {
+      std::cout << "Usage: src_dump_file_path dest_dir_path" << std::endl;
+      return -1;
+   }
+
+   boost::filesystem::path srcFilePath(argv[1]);
+   boost::filesystem::path destRootPath(argv[2]);
 
    DumpMMCCard(srcFilePath, destRootPath);
 
