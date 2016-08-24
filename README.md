@@ -576,7 +576,7 @@ With parser tools I was able to do couple of things:
 - I was able to see that content of files.db actually has relation to unicv.db which seems to be quite interesting.
   Roughly speaking - unicv.db file contains same number of data chunks that there are valid entries in files.db.
   Moreover data chunks can be divided into two groups - directories and files. When counted - both match to number of directories and files in files.db.
-  Details will go later.
+  Size of the chunk has linear relation to the size of the file. Details will go later.
   
 # Building the project.
 
