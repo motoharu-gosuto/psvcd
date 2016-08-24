@@ -4,39 +4,48 @@ PSVCD stands for Playstation Vita Cartridge Dump.
 Basically this project summarizes my half year research on the ways to do a hardware dump of PS Vita cart.
 I think I should indicate that this research has no relation to Cobra Black Fin project and team.
 
-Currently the process of dumping PS Vita carts is quite involved because you have to create custom board.
+Currently the process of dumping PS Vita carts is quite involved because you have to create a custom board.
 On the other hand - this approach does not have any firmware dependency since it is not related to software hacking.
-Current version of the board is constructed from DIP elements but I think in the future I will create PCB layout and smaller board.
+Current version of the board is constructed from DIP components but I think in the future I will create PCB layout and smaller board.
 
 So the good news are that carts actually can be dumped. You should be able to do it if you complete all the steps of this readme.
-At current point I do not know if any of these dumps can be played on multiple different instances of PS Vita.
-Most likely it is not possible currently. Process of writing content to PS Vita cart is also not established yet, though I think it can be done.
-Also most of the cart content is still encrypted. I do not know any ways to decrypt it now.
-Though I am sure that people who work with PSP and PS3 can do it because many files look similar to these consoles.
+However this does not mean that you will be able to play cartridge dump on different instance of PS Vita. 
+These dumps are the same dumps that you will acquire through Henkaku. And such dumps have multiple levels of encryption protection.
+
+Even if there was any possibility to play the dump - from the hardware point of view you would need to write the dump to some spare game cart.
+Process of writing content to PS Vita cart is not established yet, though I think it can be done.
+I also should say that at current point you will not be able to use any different type of card like SD or MMC.
+PS Vita game carts have hardware CMD56 protection which helps PS Vita to identify original carts.
 
 Last final note. This readme should not be considered as full or complete at current point.
 I hope I will be adding more and more details in the future.
+Of course - feel free to report any bugs, issues, typos etc. Any contribution will be welcome.
+
+I am not an expert in electrical engineering so if you have any expertise and see some flaws in schematics please report.
+Any information would be very appreciated.
 
 # Previous work.
 
 I know that some research was done before me. Unfortunately clear results were not published. 
 Previous works include:
-- Dump of "Monster Hunter" and "Wipe Out" made my Katsu
-- Cobra Black Fin dongle created by corresponding team
+- Dump of "Monster Hunter" and "Wipe Out" made my Katsu long time ago.
+- Cobra Black Fin dongle created by corresponding team.
 
-There were also some software dumps made by Mr.Gas and game modding/decryption made by Major_Tom.
+There were also some software dumps and decryption originally made by Mr.Gas and game modding/decryption made by Major_Tom.
 
 # Motherboard. Game cart slot schematics.
 
 There can be multiple ways to access game cart data lines on motherboard.
-- You can desolder game cart slot and solder to internal pins.
+- You can desolder game cart slot and solder wires to internal pins.
 - You can solder to test pads, located on motherboard. 
 
-First of all you will need to disassemble PS Vita body and take motherboard out.
+In any case. First of all you will need to disassemble PS Vita body and take motherboard out.
 On the opposite side you will see game cart slot. 
 
 Consider looking at pics/pic4.png
 This is overall schematic for game cart slot and surroundings with all markings that you will need.
+This schematic should not be considered complete. It was obtained by using only multimeter.
+I did not have any spare PS Vita motherboard from which I could remove solder mask.
 
 If you want to use first approach - consider looking at pics/pic1.png
 Test pads are marked as TP*
@@ -49,14 +58,16 @@ C1, C2, C3 - these are most likely supply filter capacitors
 C4, R2 - these can be RC circuit for generating game cart insert impulse
 
 If you want to use second approach - consider looking at pics/pic2.png
-Marking is similar.
+Marking is similar to previous case.
 
 Some info on schematics:
 R3, R4, R5, R6, R7 - these are pull-up resistors for DATA and CMD lines.
+CLK line does not and should not have pull-up resistor.
 
-I have chosen first approach with desoldering game cart slot since at that point I did not know all schematics.
+I have chosen first approach with desoldering game cart slot since at that point I did not know all the schematics.
 You may see at pics/pic3.png that motherboard also has LED1 and place for one more led that is not soldered.
 I have soldered 1x10 2mm female header to the pins because it fits the hole for game cart in PS Vita body.
+Since hanging connector is not a very portable solution you can glue the female header so that it is directly inside the hole.
 
 Finally you will have to create 1x10 2mm male -> 1x10 2.54mm male adapter.
 This will be required for further usage of any prototype board.
@@ -69,29 +80,30 @@ I admit that this is not the best approach, so feel free to advice.
 It is not good because you have to disassemble game cart.
 The best one would be to print game cart slot on 3d printer but I do not own one.
 Unfortunately there is no easy way to desolder game cart slot from PS Vita motherboard.
-You will definitely need desoldering gun but this is not enough. 
-Back side of cart slot is made from plastic and is glued to the motherboard.
+You will definitely need desoldering gun but I think this is not enough. 
+Back side of cart slot is made from plastic which could melt and is also glued to the motherboard.
 Even if you will manage to desolder game cart slot - construction will not be stable.
 
-So I have created simple adapter that can be used with prorotype board.
+So I have created simple adapter that can be used with prototype board.
 You will need:
-- Game cart
+- PS Vita game cart
 - Memory Stick Duo adapter
 - Memory Stick Duo card slot - I desoldered one from old card reader.
-- 1x10 2.54mm pin header 
+- 1x10 2.54mm male pin header 
 
 Steps are the following:
 - Disassemble Memory Stick Duo adapter
-- Solder pin header to adapter
+- Solder male pin header to adapter
 - Disassemble game cart - these come as monolithic chip with memory and controller on board.
 - Put game chip under pin headers of adapter then close the adapter.
 
+I suggest doing soldering step first to avoid high temperatures transferring to the cart or accidentally damaging the cart.
 Consider looking at pics/pic6.png to see how it should look like.
 
 # PS Vita game cart pinout.
 
 Game carts turned out to be simple MMC cards. Pinout is of course a bit different but it still complies with MMC card specification.
-Consider looking at pics/pic.png for details.
+Consider looking at pics/pic8.png for details.
 Game cart has 10 pins which go in the following order:
 VCC - 3.3 volt supply
 GND - ground pin
@@ -104,19 +116,32 @@ INS - insertion detect pin
 CMD - command pin
 GND - ground pin
 
+Here are some important notes about power supply before I even start.
+
+If you are going to power the cart by any means other then described custom board I would advise at least the following:
+- Never use voltage divider based on resistors.
+- Never use any power supply that is greater than 3.3V.
+- Always use filtering capacitors.
+
+Things that I did not implement which you can do:
+- Add some ESD protection to the pins.
+- Add ferrite bead.
+
+Now here are some notes about the pins.
 INS pin must be tied to ground which means that game cart is inserted.
 PS Vita uses all 4 DAT lines to transfer data from the cart and also to the cart.
 CMD line is used for transferring commands and reading response from the cart.
 CLK line would have frequency around 400 Mhz during initialization.
 When initialization is finished and reading starts, PS Vita switches to 4-bit width high speed mode.
 Not sure though if it is 26 or 52 Mhz but in any case this is very fast signal that is not easy to sample
-unless you have professional level gear. Typical logic analyzer will not help here.
+unless you have professional level gear. Typical logic analyzer will not help you here.
 
-Unfortunately FT232h can handle only one input and one output line at a time in MPSSE mode.
+We will be using FTDI FT232 chip to interface the cart but obviously it is not as powerful as PS Vita ARM Cortex.
+Unfortunately FT232h can handle only one input and one output line at a time in special mode that is called MPSSE (explained later).
 Luckily for us game carts support both 1-bit and 4-bit data width modes. 
 So by using couple of multiplexers and demultiplexers we can interface with the cart.
 Technically FT232h chip is capable of transferring data at max 30 Mhz in MPSSE mode.
-I was not able to get to such a high speed. I probably lack some knowledge but the other issue is that
+I was not able to get to such a high speed. I probably lack some knowledge about the chip but the other issue is that
 we need properly routed PCB for high speeds instead of DIP prototype board. So high speeds are not expected to work at the moment.
 Again luckily for us game carts can be accessed on low speeds for reading as well.
 
@@ -127,27 +152,28 @@ Next step would be creating custom board that will allow to dump game card.
 But before that we will need to configure FTDI chip that serves as heart of the board.
 
 For custom board you will need FT232h chip. 
-I guess FT2232h can also be used - it just has more pins and two channels instead of one.
+I guess FT2232h can also be used - it just has more pins and two channels instead of one and costs more.
 FT232h can come on a breakboard - Adafruit FT232H, FTDI UM232H etc. You can use custom board as well. 
 
 Before configuring FT232h chip you have to install D2XX direct drivers. They can be found on FTDI web page.
 
 For configuring FT232h we will need FT_Prog utility that can be downloaded from FTDI web page.
-Settings for FT232h are as following:
+Minimum settings for FT232h are as following:
 
 - USB Config Descriptor -> Self Powered: Enabled.
   We will use self powered configuration because all parts of the custom board including FT232h will be
-  powered from one voltage regulator. I found out that some FT232h chips do not give 3.3 volts 
-  on corresponding 3v3 pins when USB power mode is selected. We MUST use 3.3 volts or game cart can be damaged.
+  powered from one voltage regulator and not directly from USB. I found out that some FT232h chips do not give 3.3 volts 
+  on corresponding 3v3 pins when USB power mode is selected. So it looks like sometimes voltage regulator in FT232h 
+  does not function properly. Again, you MUST use 3.3 volts or game cart can be seriously damaged.
   
 - USB String Descriptors -> Product Desc: USB FIFO.
   This is an identifier for the device that will be later used in C++ code. It will come in handy if you use
   other FTDI devices that are also plugged into your PC. 
   For example I also used Lattice MachXO2 FPGA for some investigations. And it has FT2232h chip on board.
+  In this case - picking the first chip at random in the code is not an option so you should know device ID.
 
 - Hardware Specific -> Suspend on ACBus7 Low: Enabled.
-  This setting is required if FT232h is used in self powered mode. ACBus7 line must be tied to 5V through resistor.
-  It will be explained later.
+  This setting is required if FT232h is used in self powered mode. ACBus7 line must be tied to 5V through resistor (explained later).
 
 - Port A -> Driver -> D2XX Direct: Enabled.
   We will use fast direct drivers and not virtual com port.
@@ -155,26 +181,31 @@ Settings for FT232h are as following:
 - Port A -> Hardware -> 245 FIFO: Enabled.
   This setting is required when Sync FIFO mode or MPSSE mode is used.
 
-## Troubleshooting.
+## Troubleshooting FT_Prog and internal voltage regulator.
 
-Problem 1.
+#Problem 1.
 
 There can be cases when you will not be able to program FT232h chip. In most cases you will see this error:
 "Index was outside the bounds of the array".
-Unfortunately this is a bug in FTDI software that is mixed together with flaw in your breakboard.
-When you observe this error take a closer look at your EEPROM. Most likely you will have 93C46 type.
+Unfortunately this is a bug in FTDI software that is most likely mixed together with flaw in your breakboard.
+I saw this errors reported for Adafruit breakboard and some other breakboards as well.
+When you observe this error - take a closer look at your EEPROM chip. Most likely you will have 93C46 type.
 It is indicated in FTDI datasheets that 93C46 can be used with FT232h but unfortunately it can not.
+If your EEPROM type is different from what I have described remember that you need a EEPROM with at least 0x80 words like 93C56.
+The one with 0x40 words like 93C46 will not work from the box.
 
 There are 2 solutions for this problem.
 - FT_Prog is written in C#. You can decompile it with Reflector and fix the code a bit so that FT232h can be programmed even with smaller 93C46.
+  FTDI chip will still be functional however you will have some troubles accessing user area of the memory with driver API.
+  Reprogramming through the API most likely will not work either.  
   I have this fix so maybe I will share it in the future.
-- Desolder 93C46 EEPROM and solder 93C56 EEPROM or bigger one.
+- Desolder 93C46 EEPROM and solder proper 93C56 EEPROM or bigger one.
 
-Problem 2.
+#Problem 2.
 
-Some FT232h chips do not give 3.3v on corresponding pins when used in USB powered mode. 
-They may give 3.6v or 3.8v etc. To fix this you have to reconfigure FT232h chip to work in self powered mode.
-This may require some hadrware changes as well.
+Some FT232h chips do not give 3.3v on corresponding pins when used in USB powered mode. Which kinda surprised me.
+They may give 3.6v or 3.8v etc. To fix this you have to reconfigure FT232h chip to work in self powered mode and use external voltage regulator.
+This may require some hardware changes to the breakboard as well.
 
 For example on my breakboard I had to desolder Zero Ohm resistor that connected USB pin and VREGIN pin.
 Then I have soldered another 39K Ohm resistor that was connected to AC7 and to USB pin.
@@ -185,13 +216,13 @@ FTDI UM232H is more clever - you can use jumpers without desoldering anything.
 
 # Building custom prototype board.
 
-Heart of all system is a custom board that allows to interaction between PC and PS Vita game cart.
+Heart of all system is a custom board that allows interaction between PC and PS Vita game cart.
 Consider looking at schematic pics/pic7.png for further details.
 Custom board consists of multiple sections that are described below.
 
 ## Voltage regulator section.
 
-When powered from USB we have 5 volts. Any SD cards or MMC cards work from 3.3 volts or even lower 1.8 volts.
+When powered from USB we have 5 volts. Any SD cards or MMC cards work from 3.3 volts or even lower 1.8 volts (when supported).
 Using 5 volts will damage the card. 
 Voltage regulation section is located in top left corner of schematic file.
 
@@ -213,12 +244,10 @@ Section can be found in the middle left part of schematic file.
 
 Required parts are:
 - Two 2x10 2.54 male pin headers. These are used in conjunction with jumpers for each data line.
-- Two 2x10 2.54 female headers. These are used to connect any external devices (game cart, logic analyzer etc) or to do internal wiring.
-- JP1, JP2, JP3, JP4, JP5, JP6, JP7, JP8, JP9, JP10. These are jumpers that can be used to pull
-  each individual data line to VCC3V3.
+- SV1, SV2. Two 2x10 2.54 female headers. These are used to connect any external devices (game cart, logic analyzer etc) or to do internal wiring.
+- JP1, JP2, JP3, JP4, JP5, JP6, JP7, JP8, JP9, JP10. These are jumpers that can be used to pull each individual data line to VCC3V3.
 - R1, R2, R3, R4, R5, R6, R7, R8, R9, R10. These are 4.7K Ohm pull-up resistors.
-- JP11, JP12, JP13, JP14, JP15, JP16, JP17, JP18, JP19, JP20. These are jumpers that can be used
-  to pull each individual data line to GND.
+- JP11, JP12, JP13, JP14, JP15, JP16, JP17, JP18, JP19, JP20. These are jumpers that can be used to pull each individual data line to GND.
 - R11, R12, R13, R14, R15, R16, R17, R18, R19, R20. These are 4.7K Oh, pull-down resistors.
 
 ## Data multiplexing section.
@@ -226,17 +255,17 @@ Required parts are:
 This section is used to select 1 of 8 data lines and feed output to FT232h chip.
 Section can be found in the bottom left part of schematic file.
 Data transfer between game cart and PS Vita is bidirectional. 
-That means that we may use tristate buffers as well. Though buffers are optional.
-Output of multiplexer can be controlled with G (enable) signal.
+That means that we may use tristate buffers as well. Though I think these buffers are optional.
+Output of multiplexer just can be controlled with G (enable) signal.
 
 Required parts are:
 - 74HC244N: Octal tristate buffer.
-- 74HC151N: 8-dine to 1-dine data multiplexer.
+- 74HC151N: 8-line to 1-line data multiplexer.
 
 Main idea is to connect data lines D0-D7 to 74HC244N. Output of 74HC244N should be connected to 74HC151N.
 74HC151N will allow to select one of 8 data lines. Others will be tristate.
 Address lines of 74HC151N are connected to GPIO pins of FT232h.
-Enable pins of 74HC244N should be connected to GPIO pin of FT232h.
+Enable pins of 74HC244N should be connected to single GPIO pin of FT232h.
 
 This will allow to select and read 1 of 8 data lines while others will be tristate. 
 Address of line and read/write mode will be controlled by FT232h.
@@ -248,7 +277,7 @@ Section can be found in the bottom right part of schematic file.
 
 Required parts are:
 - Two 74HC125N: Quadruple bus buffer gates with tristate outputs.
-- 74HCT138N: 3 to 8 line decoder, inverting
+- 74HCT138N: 3 to 8 line decoder, inverting.
 
 Main idea is to connect data lines D0-D7 to output pins of 74HC125N tristate buffers.
 Outputs of 74HCT138N decoder should be connected to enable pins of 74HC125N.
@@ -264,12 +293,12 @@ Address of line and read/write mode will be controlled by FT232h.
 PS Vita game cart requires special initialization sequence before game cart can be read.
 This sequence can not be reproduced at current point. Though it is already partially known.
 To bypass this initialization a simple trick can be used:
-- Allow real PS Vita to initialize game cart. 
+- Allow real instance of PS Vita to initialize game cart. 
 - Then connect custom board. 
 - Then disconnect PS Vita.
 - Now you can read game cart.
 
-Make sure that during these steps game cart is always powered.
+Make sure that during these steps game cart is always powered with 3.3V.
 
 Required parts are:
 - SV5, SV6, SV7: Three 1x10 2.54mm female headers.
@@ -281,7 +310,7 @@ On the other hand game cart will be connected to SV7.
 ## Custom board core section.
 
 Core of the custom board is FT232h chip.
-There are some other components required so that Ft232h runs as expected.
+There are some other components required so that FT232h runs as expected.
 
 Required parts are:
 - R23, R24, R25, R27, R28, R29, R30, R31, R32: 4.7K Ohm pull-up/pull-down resistors.
@@ -298,8 +327,9 @@ All address lines and R/W line can be pulled together either to GND or to VCC by
 Due to properties of my prototype board I was not able to solder separate jumper for each line. But you can do it.
 
 GPIOH AC7 line should be connected to USB 5V pin of FT232h through 39K Ohm pull-up resistor.
-GPIOH AC8, AC9 pins can not be used in MPSSE mode of FT232h so they are not connected.
-MPSSE mode will be explained later.
+This is required for self powered configuration. Please consider looking in FTDI datasheets.
+
+GPIOH AC8, AC9 pins can not be used in MPSSE mode (explained later) of FT232h so they are not connected.
 VREGIN pin of FT232h should be connected to 3.3 volt output of voltage regulator.
 
 3V3, VCCIO pins should be connected to 3.3 volt and two GND pins should be connected to ground.
@@ -308,35 +338,39 @@ GPIOL AD0 pin will serve as CLK in MPSSE mode.
 GPIOL AD2 pin will serve as DIN in MPSSE mode so it is connected to 74HC151N output.
 GPIOL AD5 pin will serve as DWAIT in MPSSE mode so it is connected to 74HC151N output also.
 GPIOL AD1 pin will serve as DOUT in MPSSE mode so it is connected to input of 74HC125N buffers.
-GPIOL AD3 pin can only serve as CS in MPSSE mode so it is not used and not connected.
+GPIOL AD3 pin can only serve as CS signal in MPSSE mode so it is not used and not connected.
 GPIOL AD4, AD6, AD7 pins are not used so they are not connected.
 
 DOUT, DIN/DWAIT lines can be pulled together either to GND or to VCC by using jumpers JP21 or JP22.
+Due to properties of my prototype board I was not able to solder separate jumper for each line. But you can do it.
 
 ## Why FT232h. MPSSE Mode Description.
 
-Choice of FTDI FT232h chip was not spontaneous. There are two main reasons for this:
-- It allows easy interfacing with other devices through USB
+Choice of FTDI FT232h chip was not spontaneous. There are three main reasons for this:
+- It is cheap and comes in relatively easy to solder TQFP package.
+- It allows easy interfacing with other devices through USB.
 - It allows to implement custom protocol with special MPSSE mode if having standard interfaces like UART, FIFO, SPI is not enough for you.
+  I did not expect that it would be well known MMC protocol so I was preparing for developing something more custom.
 
 Basically MPSSE mode is the special mode of FT232h where you send commands to the chip through USB and they are translated into signals.
 Main features that may be useful for custom protocol include:
 - Single CLK line
 - Single DIN line
 - Single DOUT line
-- Single Wait line
+- Single WAIT line
 - 3 GPIO Low pins
 - 7 GPIO High pins
 
 Using this MPSSE mode I have implemented variation of MMC protocol which uses 1-bit width bus and low frequency mode to transfer the data in both directions.
 
 I also use FT232h in FIFO mode together with FPGA when I need to investigate packets on the data line.
+This was the only way I was able to dump CMD56 initialization sequence (explained later).
 And there are many other ways FT232h can be used as well.
 
 # Interconnections. Connecting PS Vita, game cart and custom board.
 
 Most of the custom board connections are soldered. But I tried to keep custom board as much generic as I could.
-So I left out some interconnections that should be connected with dupont wires. This allows more flexible configuration.
+So I left out some interconnections that should be connected with dupont jumper wires. This allows more flexible configuration.
 
 Consider looking at pics/pic7.png for further details.
 
@@ -350,13 +384,16 @@ There is some additional wiring required as well.
 - Use female pin header SV4 to connect GND line with corresponding pins of the game cart. You can use SV1 or SV2 for this.
 - Connect CLK pin of FT232h with corresponding pin of the game cart. You can use SV1 or SV2 for this.
 - From jumpers JP1-JP10 select those that you have used for CLK, CMD and DAT0 lines. Place these three jumpers to pull-up the lines.
+  I previously mentioned that CLK line should not pull-up resistor. However this situation is different because in this case CLK signal
+  generated by FT232h is tristate so it must be pulled-up.
+- Uee JP22, JP24 jumpers to pull all aux lines to 3.3V.
 
 Consider looking at pics/pic9.png which shows final result.
 You may notice one difference to the schematic - WAIT-DIN wire should not be there.
-Basically I did not solder this two wires together so I had to place a connection wire.
+Basically I did not solder this two wires together so I had to place a jumper connection wire.
 
 Final connection with PS Vita wired together is shown on picture pics/pic10.png
-You may notice that I had connected everything to the prototype board. 
+You may notice that I had connected everything through the prototype board. 
 Basically I did not have 1x10 DIP switches so I had to manually switch wires.
 
 # PS Vita game cart protocol.
@@ -403,7 +440,7 @@ This step is required for initialization. If it is not executed game cart can no
 CMD56 is generic command that allows PS Vita to interface with game cart by sending and receiving data packets.
 Format of these packets is vendor specific. So basically this step is a game cart protection step which identifies only original game carts.
 
-This initialization happens at high speed and is hard to sample unless you own professional gear. I do not own one so I have tried to sample with FPGA instead.
+This initialization happens at high speed and is hard to sample unless you own professional level gear. I do not own one so I have tried to sample with FPGA instead.
 As far as I understand this step includes 10 pairs of request/response packets.
 Some of these packets are constant while others are not and partially change after each time you turn on PS Vita.
 This is most likely related to some encryption mechanism.
@@ -431,14 +468,14 @@ Lucky for us very old trick can be used to bypass this protection. Steps are the
 - Disconnect PS Vita - use SV2 DIP switch. Make sure that at this point PS Vita did not go to sleep mode and screen is still turned on. 
   When PS Vita goes to sleep mode it sends deinitialization sequence to the game cart.
   
-At this point game cart is initialized but we need to send couple more commands before we can read the data.
+At this point game cart is initialized but we need to send a couple more commands before we can read the data.
 First command is CMD6 [46 03 B9 00 00 39] - this switches game cart to low speed mode. Technically you should get a response for this command.
 But custom board is not able to handle high speeds so basically this response will contain garbage.
 Second command is CMD6 [46 03 B7 00 00 3B] - this switches game cart to 1-bit width data mode from 4-bit width data mode that is used by PS Vita.
 This command should give valid response since we are now in low speed mode.
 
 At this point you should be able to read PS Vita game cart.
-Basic commands that can be used include:
+Basic command sequences that can be used include:
 - CMD17, CMD13 - reads single sector, check cart status.
 - CMD23, CMD18, CMD13 - set number of sectors, read multiple sectors, check cart status.
 
@@ -454,7 +491,7 @@ Surprisingly game cart filesystem is EXFAT. There are no official specifications
 Filesystem is not complicated and can be parsed without any issues. I have created corresponding parser tool that takes raw cart dump as input and
 produces directory structure with all the files from the cart in specified location.
 
-There is one exception that I should mention. EXFAT filesystem is not located at sector zero.
+There is one exception that I should mention. EXFAT filesystem is not located at sector zero of the cart.
 Instead at sector zero you will find some SCEI specific structure that points to EXFAT VBR record.
 
 # Directory structure.
@@ -512,14 +549,35 @@ Directory structure looks as following (will fix this list later. is is displaye
   - update
    - psp2updat.pup
  
-# File encryption/compression.
+# File encryption.
 
-Most of the files are encrypted/compressed - I am not sure which.
-So most likely this dump can not be easily used on different PS Vita instances.
-I only obtained valid dump recently and did not have time yet to explore the files.
-I am quite sure that encryption scheme should be quite identical to ps3.
-So most likely people that are experienced in that area will be able to figure out the details much quicker.
+At first I thought that I was doing something wrong when I was dumping .png files and they did not contain any PNG magic word in the header.
+It turned out most of the files that are on the game cart are encrypted. I investigated this matter and read some notes about this
+made by Hykem, Mr.Gas and Major_Tom. Also went through PS Vita dev wiki and sources of PS3 emulator - encryption part.
+So as far as I understand first layer of encryption is called PFS and is based on at least these files:
+- clearsign. This is a key file.
+- sce_pfs/files.db. This should contain list of files and overall directory structure on the cart.
+  It also contains useful information such as size of file. It seems that it also contains hashes for the files.
+  However type of the hash is unknown - I found only vague description on dev wiki.
+  Hashes are 20 byte long so judging from documentation for other PS devices it seems that common one would be HMAC-SHA1.
+  I have created parser tool for this file since dev wiki info was quite vague as I have already mentioned.
+  I will share it later.
+- sce_pfs/unicv.db. This should contain ICV values but I did not find any good description for this file.
+  I may assume that people already know the structure of this file and I just did not find it. 
+  However I have created parser tool for this file by looking through the layout of the file.
+  I will share it later.
+  
+As I have already indicated - you will not be able to play game cart dump on different instance of PS Vita because of encryption.
+This is a well known fact by the time I am writing this.
 
+With parser tools I was able to do couple of things:
+- Verify file sizes. This made me confident that I did dump correctly. The other thing that is more reliable is that
+  every 512 bytes of the dump are checked with crc16 - thanks to MMC protocol. So you should definitely obtain valid dump.
+- I was able to see that content of files.db actually has relation to unicv.db which seems to be quite interesting.
+  Roughly speaking - unicv.db file contains same number of data chunks that there are valid entries in files.db.
+  Moreover data chunks can be divided into two groups - directories and files. When counted - both match to number of directories and files in files.db.
+  Details will go later.
+  
 # Building the project.
 
 ## Installing D2XX direct drivers.
@@ -552,12 +610,12 @@ These two variables will be used by cmake later.
 
 ## Installing cmake.
 
-Cmake is very useful crossplatform tool for generating makefiles/solutions etc.
+Cmake is very useful cross platform tool for generating makefiles/solutions etc.
 You can obtain installation from their web page.
 
 ## Generating solution.
 
-All you need is to navigate to src folder and execute generate.bat
+All you need is to navigate to src folder and execute generate.bat.
 It will invoke cmake and generate MSVC 12 solution.
 If you want to use different version of MSVC - just change generator name that is specified in the bat.
 You can check generator names by calling cmake help.
@@ -577,7 +635,9 @@ There are three executables and one library in total:
  * standalone initialization : this is currently a prototype because I need to figure out what to do with CMD56.
  * entering dumpable state : this executes sequence of commands that prepare PS Vita game cart for dumping using FTDI chip and custom board.
  * dump PS Vita game cart : this basically starts dumping PS Vita game cart to binary file. 
-   This is a long process and it can be interupted by transmission errors. However you can continue dump after failure by specifying different cluster address.
+   This is a long process and it can be interupted by transmission errors. I tried to avoid these as much as possible by restoring connection with different approaches.
+   Still - sometimes fatal errors can occur. In this situation the only solution would be to turn of power supply of custom board and repeat initialization bypass trick.
+   However you can continue dump after failure by specifying different cluster address.
    Different destination file can also be specified if you wish to manually merge parts of the dump. For example in WinHex.
 - dump_exfat: this one basically takes raw dump of PS Vita game cart and extracts all the directory hierarchy and the files to specified location.
 
@@ -589,5 +649,19 @@ After you have bypassed CMD56 initialization step by using DIP switches do the f
 - Wait. Seriously wait. Dump can take around 20 hours for 3.5 GB of data. I do not have exact time metrics but I am going to measure total time that can be required for dump.
 
 When dump is finished you should obtain binary file that is basically snapshot of game cart filesystem.
+Temporary copy this file somewhere just in case. You do not want to wait 20 hours more, do you?
 Pass this file to dump_exefat executable and specify destination directory path. 
 This tool then should extract all the files and create corresponding directory structure in the destination folder.
+
+#Future work.
+
+These would be next milestones for the future, not including lots of minor TODOs in this readme or in the code.
+- Try using SD card or MMC card or custom SDIO device with RAM chip. Of course bypassing trick still will be required.
+- Try writing to the cart. I would need to obtain some very cheap game cart that is worth experimenting with.
+- Investigate CMD56 initialization sequence. I have no idea how I should do it. 
+  Maybe I will dump PS Vita modules through Henkaku with Vitadump tool released by Zecoxao.
+  Then look through with IDA?
+- Implement the same cart dumping functionality but using STM32F4 discovery breakboard. 
+  This has ARM Cortex on board that supports 4-bit width SD/SDIO and high speed.
+  This will allow much faster dumping. And one more advantage would be that custom board will not be required.
+- There is one thing that really bothers me. EXFAT filesystem has BOOT sector. Can this be used as any kind of exploit?  
