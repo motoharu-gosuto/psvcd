@@ -10,7 +10,7 @@
 #include <common/FTDIInitialization.h>
 
 #include "MMCInitialization.h"
-//#include "CMD56Initialization.h"
+#include "CMD56Initialization.h"
 #include "MMCCommands.h"
 
 //It is very interesting that PS Vita game cart can actually use any RCA
@@ -178,7 +178,7 @@ void psvcd::InitializeMMCCard(FT_HANDLE ftHandle)
    }
 
    //TODO: this method is not yet shared due to content of CMD56 packets
-   //CMD56Initialization(ftHandle, PS_VITA_CUSTOM_RCA);
+   CMD56Initialization(ftHandle, PS_VITA_CUSTOM_RCA);
 
    //TODO: this method does not work as expected yet
    //SwitchToHighSpeedState(ftHandle, PS_VITA_CUSTOM_RCA);
