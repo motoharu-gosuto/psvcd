@@ -477,10 +477,11 @@ int SendKirkProxyCommand4(SOCKET socket, command_4_request* cmd4, command_4_resp
 
    int bytesToReceive = sizeof(command_4_response);
    int bytesWereReceived = 0;
+   command_4_response* respcpy = resp4;
 
    while(bytesToReceive != bytesWereReceived)
    {
-      int iResult = recv(socket, ((char*)&resp4) + bytesWereReceived, bytesToReceive - bytesWereReceived, 0);
+      int iResult = recv(socket, ((char*)respcpy) + bytesWereReceived, bytesToReceive - bytesWereReceived, 0);
       if(iResult != sizeof(command_4_response))
       {
          if(iResult == 0)
@@ -549,8 +550,15 @@ int KirkSendCommand_1C(SOCKET socket, uint16_t param0,
    memcpy(cmd4.data, &input, sizeof(kirk_1C_input)); //0x40
 
    command_4_response resp4;
+   
+   if(SendKirkProxyCommand4(socket, &cmd4, &resp4) < 0)
+      return -1;
 
-   return SendKirkProxyCommand4(socket, &cmd4, &resp4);
+   if(resp4.size != 0x33) // expected size
+      return -1;
+
+   memcpy(result_1c.data(), resp4.data, resp4.size);
+   return 0;
 }
 
 int SendPacket9(FT_HANDLE ftHandle, WORD RCA, std::array<BYTE, 0x33>& result_1c)
