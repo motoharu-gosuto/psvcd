@@ -1263,16 +1263,13 @@ void psvcd::CMD56Initialization(FT_HANDLE ftHandle, WORD RCA)
       deinitialize_kirk_proxy_connection(kirk_socket);
       return;
    }
-
-   //currently does not work
-   /*
+   
    if(KirkSendCommand_1D(kirk_socket, param0, packet6_data, result_1c, kirk_gen10_data1, packet14_data) < 0)
    {
       deinitialize_kirk_proxy_connection(kirk_socket);
       return;
    }
-   */
-
+   
    std::array<BYTE, 0x33> result_1e2;
    memset(result_1e2.data(), 0, result_1e2.size());
 
@@ -1297,14 +1294,11 @@ void psvcd::CMD56Initialization(FT_HANDLE ftHandle, WORD RCA)
       return;
    }
 
-   //currently does not work
-   /*
    if(KirkSendCommand_1F(kirk_socket, param0, packet6_data, result_1c, result_1e2, packet16_data) < 0)
    {
       deinitialize_kirk_proxy_connection(kirk_socket);
       return;
    }
-   */
 
    std::array<BYTE, 0x33> result_1e3;
    memset(result_1e3.data(), 0, result_1e3.size());
@@ -1353,14 +1347,11 @@ void psvcd::CMD56Initialization(FT_HANDLE ftHandle, WORD RCA)
       return;
    }
 
-   //currently does not work
-   /*
    if(KirkSendCommand_20(kirk_socket, param0, packet6_data, result_1c, result_1e3, packet18_data, kirk_gen10_data2, packet20_data) < 0)
    {
       deinitialize_kirk_proxy_connection(kirk_socket);
       return;
    }
-   */
 
    if(deinitialize_kirk_proxy_connection(kirk_socket) < 0)
       return;
