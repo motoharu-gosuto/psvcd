@@ -98,6 +98,39 @@ struct kirk_1C_input
    uint8_t packet8[0x20];
 };
 
+struct kirk_1D_input
+{
+   uint8_t packet6[0x20];
+   uint8_t packet9[0x30];
+   uint8_t packet13[0x10];
+   uint8_t packet14[0x43];
+};
+
+struct kirk_1E_input
+{
+   uint8_t packet6[0x20];
+   uint8_t packet9[0x30];
+   uint8_t param;
+};
+
+struct kirk_1F_input
+{
+   uint8_t packet6[0x20];
+   uint8_t packet9[0x30];
+   uint8_t packet15[0x20];
+   uint8_t packet16[0x43];
+};
+
+struct kirk_20_input
+{
+   uint8_t packet6[0x20];
+   uint8_t packet9[0x30];
+   uint8_t packet17 [0x20];
+   uint8_t packet18 [0x43];
+   uint8_t packet19 [0x10];
+   uint8_t packet20 [0x53];
+};
+
 #pragma pack(pop)
 
 int initialize_kirk_proxy_connection(SOCKET& ConnectSocket);
